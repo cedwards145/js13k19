@@ -1,3 +1,5 @@
+import { Player } from "./player";
+
 const WIDTH = 1280;
 const HEIGHT = 720;
 
@@ -6,15 +8,9 @@ canvas.width = WIDTH;
 canvas.height = HEIGHT;
 const context = canvas.getContext("2d");
 
-const player = {
-    x: 32,
-    y: 32,
-    width: 32,
-    height: 32,
-    speed: 3
-};
+const player = new Player(32, 32);
 
-keys = {};
+const keys = {};
 
 window.onkeydown = function(event) {
     keys[event.keyCode] = true;
@@ -31,12 +27,14 @@ function tick(elapsed) {
 }
 
 function update(delta) {
+    var direction = 0;
     if (keys[65]) {
-        player.x -= player.speed;
+        direction = -1;
     }
     else if (keys[68]) {
-        player.x += player.speed;
+        direction = 1;
     }
+    player.move(direction);
 }
 
 function draw(context) {
