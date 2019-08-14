@@ -62,4 +62,4 @@ typings/
 
 # Built JS files
 dist/*.js
-
+build/*
