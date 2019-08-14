@@ -1,0 +1,15 @@
+{
+  "name": "js13k19",
+  "version": "1.0.0",
+  "dependencies": {},
+  "devDependencies": {
+    "webpack": "^4.39.2",
+    "webpack-cli": "^3.3.6"
+  },
+  "scripts": {
+    "build": "webpack --mode production",
+    "dev": "webpack --mode development",
+    "package" : "bestzip js13k.zip dist/*",
+    "deploy" : "npm-run-all build package"
+  }
+}
