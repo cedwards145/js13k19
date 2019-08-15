@@ -61,21 +61,10 @@ function draw(context) {
     context.fillRect(player.x, player.y, player.width, player.height);
     
     context.strokeRect(rectangle.x, rectangle.y, rectangle.width, rectangle.height);
-    
-    var nearestX = Math.max(rectangle.x, Math.min(circle.x, rectangle.x + rectangle.width));
-    var nearestY = Math.max(rectangle.y, Math.min(circle.y, rectangle.y + rectangle.height));
-    var deltaX = circle.x - nearestX;
-    var deltaY = circle.y - nearestY;
-    var collides = (deltaX * deltaX + deltaY * deltaY) < (circle.radius * circle.radius);
 
-    if (collides) {
+    if (circle.collidesWithRectangle(rectangle)) {
         context.fillStyle = "red";
         context.strokeStyle = "red";
-        
-        context.beginPath();
-        context.ellipse(nearestX, nearestY, 3, 3, 0, 0, 360);
-        context.closePath();
-        context.fill();
     }
     else {
         context.fillStyle = "white";
@@ -86,10 +75,6 @@ function draw(context) {
     context.ellipse(circle.x, circle.y, circle.radius, circle.radius, 0, 0, 360);
     context.closePath();
     context.stroke();
-}
-
-function checkCollision() {
-    
 }
 
 tick(0);
