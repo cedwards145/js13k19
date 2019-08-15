@@ -1,4 +1,6 @@
 import { Player } from "./player";
+import { Circle } from "./circle";
+import { Rectangle } from "./rectangle";
 
 const WIDTH = 1280;
 const HEIGHT = 720;
@@ -6,20 +8,17 @@ const HEIGHT = 720;
 const canvas = document.getElementById("game");
 canvas.width = WIDTH;
 canvas.height = HEIGHT;
+const canvasOffset = canvas.getBoundingClientRect();
+
 const context = canvas.getContext("2d");
 
 const player = new Player(600, HEIGHT - 32);
-const blobs = [];
-for (var count = 0; count < 50; count++) {
-    const size = Math.random() * 64 + 16;
-    const blob = new Player(Math.random() * 200, HEIGHT - size);
-    blob.width = size;
-    blob.height = size;
-    blob.speed = Math.random() * 1.75 + 1;
-    blobs.push(blob);
-}
-
 const keys = {};
+
+const circle = new Circle(0, 0, 50);
+const rectangle = new Rectangle(WIDTH / 2, HEIGHT / 2, 100, 100);
+
+const mouse = {x: 0, y: 0};
 
 window.onkeydown = function(event) {
     keys[event.keyCode] = true;
@@ -28,6 +27,11 @@ window.onkeydown = function(event) {
 window.onkeyup = function(event) {
     keys[event.keyCode] = false;
 }
+
+window.addEventListener('mousemove', e => {
+    mouse.x = e.clientX - canvasOffset.left;
+    mouse.y = e.clientY - canvasOffset.top;
+});
 
 function tick(elapsed) {
     update(elapsed);
@@ -45,11 +49,8 @@ function update(delta) {
     }
     player.move(direction);
 
-    for (var index = 0; index < blobs.length; index++) {
-        const blob = blobs[index];
-        const direction = Math.sign(player.x - blob.x);
-        blob.move(direction);
-    }
+    circle.x = mouse.x;
+    circle.y = mouse.y;
 }
 
 function draw(context) {
@@ -58,15 +59,37 @@ function draw(context) {
 
     context.fillStyle = "white";
     context.fillRect(player.x, player.y, player.width, player.height);
+    
+    context.strokeRect(rectangle.x, rectangle.y, rectangle.width, rectangle.height);
+    
+    var nearestX = Math.max(rectangle.x, Math.min(circle.x, rectangle.x + rectangle.width));
+    var nearestY = Math.max(rectangle.y, Math.min(circle.y, rectangle.y + rectangle.height));
+    var deltaX = circle.x - nearestX;
+    var deltaY = circle.y - nearestY;
+    var collides = (deltaX * deltaX + deltaY * deltaY) < (circle.radius * circle.radius);
 
-    context.fillStyle = "black";
-    for (var index = 0; index < blobs.length; index++) {
-        const blob = blobs[index];
+    if (collides) {
+        context.fillStyle = "red";
+        context.strokeStyle = "red";
+        
         context.beginPath();
-        context.ellipse(blob.x + (blob.width / 2), blob.y + (blob.height / 2), blob.width / 2, blob.height / 2, 0, 0, 360);
+        context.ellipse(nearestX, nearestY, 3, 3, 0, 0, 360);
         context.closePath();
         context.fill();
     }
+    else {
+        context.fillStyle = "white";
+        context.strokeStyle = "white";
+    }
+
+    context.beginPath();
+    context.ellipse(circle.x, circle.y, circle.radius, circle.radius, 0, 0, 360);
+    context.closePath();
+    context.stroke();
+}
+
+function checkCollision() {
+    
 }
 
 tick(0);
