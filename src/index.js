@@ -16,12 +16,14 @@ const player = new Player(600, HEIGHT - 32);
 const keys = {};
 
 const dynamicBodies = [
-    new Circle(0, 0, 50)
+    new Circle(WIDTH / 2, 0, 50)
 ];
 
-const staticBodies = [
-    new Rectangle(WIDTH / 2, HEIGHT / 2, 100, 100)
-];
+const staticBodies = [];
+for (var count = 0; count < 10; count++) {
+    staticBodies.push(new Rectangle(count * (WIDTH / 10) + 10, HEIGHT / 2, 25, 25));
+    staticBodies.push(new Rectangle(count * (WIDTH / 10) + 60, HEIGHT / 4, 25, 25));
+}
 
 const mouse = {x: 0, y: 0};
 
@@ -54,9 +56,13 @@ function update(delta) {
     }
     player.move(direction);
 
-    const circle = dynamicBodies[0];
-    circle.x = mouse.x;
-    circle.y = mouse.y;
+    for (var index = 0; index < dynamicBodies.length; index++) {
+        var body = dynamicBodies[index];
+        body.velocity.y += 0.1;
+
+        body.x += body.velocity.x;
+        body.y += body.velocity.y;
+    }
 
     resolveCollisions();
 }
@@ -104,6 +110,10 @@ function resolveCollision(circle, rectangle) {
         const normalisedY = deltaY / distance;
         circle.x = nearestX + normalisedX * circle.radius;
         circle.y = nearestY + normalisedY * circle.radius;
+
+        const circleCurrentSpeed = Math.sqrt((circle.velocity.y * circle.velocity.y) + (circle.velocity.x * circle.velocity.x));
+        circle.velocity.x = normalisedX * circleCurrentSpeed * 0.4;
+        circle.velocity.y = normalisedY * circleCurrentSpeed * 0.4;
     }
 }
 

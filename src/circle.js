@@ -3,6 +3,7 @@ class Circle {
         this.x = x;
         this.y = y;
         this.radius = radius;
+        this.velocity = {x:0, y:0};
     }
 
     collidesWithRectangle(rectangle) {
