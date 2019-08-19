@@ -1,14 +1,32 @@
+import { Circle } from "./circle";
+
+const WIDTH = 32;
+
 class Player {
     constructor(x, y) {
-        this.x = x;
-        this.y = y;
-        this.width = 32;
-        this.height = 32;
         this.speed = 3;
+        this.collider = new Circle(x + WIDTH / 2, y + WIDTH / 2, WIDTH / 2);
     }
 
-    move(amount) {
-        this.x += amount * this.speed;
+    getX() {
+        return this.collider.x - this.collider.radius;
+    }
+
+    getY() {
+        return this.collider.y - this.collider.radius;
+    }
+
+    getWidth() {
+        return this.collider.radius * 2;
+    }
+
+    getHeight() {
+        return this.collider.radius * 2;
+    }
+
+    move(x, y) {
+        this.collider.x += x * this.speed;
+        this.collider.y += y * this.speed;
     }
 }
 

@@ -1,6 +1,8 @@
 import { Player } from "./player";
-import { Circle } from "./circle";
 import { Rectangle } from "./rectangle";
+import map from "../map.json";
+
+console.log(map);
 
 const WIDTH = 1280;
 const HEIGHT = 720;
@@ -12,17 +14,29 @@ const canvasOffset = canvas.getBoundingClientRect();
 
 const context = canvas.getContext("2d");
 
-const player = new Player(600, HEIGHT - 32);
+const player = new Player(200, 200);
 const keys = {};
 
-const dynamicBodies = [
-    new Circle(WIDTH / 2, 0, 50)
-];
+const dynamicBodies = [];
+dynamicBodies.push(player.collider);
 
 const staticBodies = [];
-for (var count = 0; count < 10; count++) {
-    staticBodies.push(new Rectangle(count * (WIDTH / 10) + 10, HEIGHT / 2, 25, 25));
-    staticBodies.push(new Rectangle(count * (WIDTH / 10) + 60, HEIGHT / 4, 25, 25));
+/*
+staticBodies.push(new Rectangle(50, 50, 50, 400));
+staticBodies.push(new Rectangle(100, 50, 300, 50));
+staticBodies.push(new Rectangle(100, 400, 300, 50));
+staticBodies.push(new Rectangle(400, 50, 50, 150));
+staticBodies.push(new Rectangle(400, 300, 50, 150));
+*/
+
+const tiles = map.layers[0].data;
+for (var index = 0; index < tiles.length; index++) {
+    if (tiles[index] !== 0) {
+        console.log("Box");
+        var x = index % map.width;
+        var y = Math.floor(index / map.height);
+        staticBodies.push(new Rectangle(50 * x, 50 * y, 50, 50));
+    }
 }
 
 const mouse = {x: 0, y: 0};
@@ -47,23 +61,23 @@ function tick(elapsed) {
 }
 
 function update(delta) {
-    var direction = 0;
+    var x = 0;
+    var y = 0;
+
     if (keys[65]) {
-        direction = -1;
+        x = -1;
     }
     else if (keys[68]) {
-        direction = 1;
+        x = 1;
     }
-    player.move(direction);
-
-    for (var index = 0; index < dynamicBodies.length; index++) {
-        var body = dynamicBodies[index];
-        body.velocity.y += 0.1;
-
-        body.x += body.velocity.x;
-        body.y += body.velocity.y;
+    if (keys[87]) {
+        y = -1;
+    }
+    else if (keys[83]) {
+        y = 1;
     }
 
+    player.move(x, y);
     resolveCollisions();
 }
 
@@ -72,7 +86,7 @@ function draw(context) {
     context.fillRect(0, 0, WIDTH, HEIGHT);
 
     context.fillStyle = "white";
-    context.fillRect(player.x, player.y, player.width, player.height);
+    context.fillRect(player.getX(), player.getY(), player.getWidth(), player.getHeight());
 
     for (var index = 0; index < staticBodies.length; index++) {
         var rectangle = staticBodies[index];        
