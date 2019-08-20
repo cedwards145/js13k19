@@ -89,6 +89,17 @@ function draw(context) {
         var rectangle = staticBodies[index];        
         context.fillRect(rectangle.x, rectangle.y, rectangle.width, rectangle.height);
     }
+
+    context.fillStyle = generateLightGradient(context);
+    context.fillRect(0, 0, WIDTH, HEIGHT);5
+}
+
+function generateLightGradient(context) {
+    var gradient = context.createRadialGradient(player.getX(), player.getY(), TILE_SIZE * 4, player.getX(), player.getY(), TILE_SIZE * 8);
+    gradient.addColorStop(0, 'rgba(0, 0, 0, 0)');
+    gradient.addColorStop(1, 'rgba(0, 0, 0, 1.0)');
+    
+    return gradient;
 }
 
 function resolveCollisions() {
