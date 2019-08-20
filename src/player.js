@@ -1,6 +1,6 @@
 import { Circle } from "./circle";
 
-const WIDTH = 32;
+const WIDTH = 14;
 
 class Player {
     constructor(x, y) {
@@ -9,19 +9,19 @@ class Player {
     }
 
     getX() {
-        return this.collider.x - this.collider.radius;
+        return this.collider.x;
     }
 
     getY() {
-        return this.collider.y - this.collider.radius;
+        return this.collider.y;
     }
 
     getWidth() {
-        return this.collider.radius * 2;
+        return this.collider.radius;
     }
 
     getHeight() {
-        return this.collider.radius * 2;
+        return this.collider.radius;
     }
 
     move(x, y) {

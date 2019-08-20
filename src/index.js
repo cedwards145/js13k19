@@ -6,6 +6,7 @@ console.log(map);
 
 const WIDTH = 1280;
 const HEIGHT = 720;
+const TILE_SIZE = 16;
 
 const canvas = document.getElementById("game");
 canvas.width = WIDTH;
@@ -14,28 +15,20 @@ const canvasOffset = canvas.getBoundingClientRect();
 
 const context = canvas.getContext("2d");
 
-const player = new Player(200, 200);
+const player = new Player(TILE_SIZE * 4, TILE_SIZE * 4);
 const keys = {};
 
 const dynamicBodies = [];
 dynamicBodies.push(player.collider);
 
 const staticBodies = [];
-/*
-staticBodies.push(new Rectangle(50, 50, 50, 400));
-staticBodies.push(new Rectangle(100, 50, 300, 50));
-staticBodies.push(new Rectangle(100, 400, 300, 50));
-staticBodies.push(new Rectangle(400, 50, 50, 150));
-staticBodies.push(new Rectangle(400, 300, 50, 150));
-*/
 
 const tiles = map.layers[0].data;
 for (var index = 0; index < tiles.length; index++) {
     if (tiles[index] !== 0) {
-        console.log("Box");
         var x = index % map.width;
         var y = Math.floor(index / map.height);
-        staticBodies.push(new Rectangle(50 * x, 50 * y, 50, 50));
+        staticBodies.push(new Rectangle(TILE_SIZE * x, TILE_SIZE * y, TILE_SIZE, TILE_SIZE));
     }
 }
 
@@ -86,19 +79,15 @@ function draw(context) {
     context.fillRect(0, 0, WIDTH, HEIGHT);
 
     context.fillStyle = "white";
-    context.fillRect(player.getX(), player.getY(), player.getWidth(), player.getHeight());
+    context.beginPath();
+    context.ellipse(player.getX(), player.getY(), player.getWidth(), player.getHeight(), 0, 0, 360);
+    context.closePath();
+    context.fill();
 
+    context.fillStyle = "black";
     for (var index = 0; index < staticBodies.length; index++) {
         var rectangle = staticBodies[index];        
-        context.strokeRect(rectangle.x, rectangle.y, rectangle.width, rectangle.height);
-    }
-
-    for (var index = 0; index < dynamicBodies.length; index++) {
-        var circle = dynamicBodies[index];        
-        context.beginPath();
-        context.ellipse(circle.x, circle.y, circle.radius, circle.radius, 0, 0, 360);
-        context.closePath();
-        context.stroke();
+        context.fillRect(rectangle.x, rectangle.y, rectangle.width, rectangle.height);
     }
 }
 
