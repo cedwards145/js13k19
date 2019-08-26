@@ -1,8 +1,7 @@
 import { Player } from "./player";
 import { Rectangle } from "./rectangle";
 import map from "../map.json";
-
-console.log(map);
+import { loadMap } from "./maploader";
 
 const WIDTH = 1280;
 const HEIGHT = 720;
@@ -15,23 +14,13 @@ const canvasOffset = canvas.getBoundingClientRect();
 
 const context = canvas.getContext("2d");
 
-const player = new Player(TILE_SIZE * 4, TILE_SIZE * 4);
+const player = new Player(350, 1400);
 const keys = {};
 
 const dynamicBodies = [];
 dynamicBodies.push(player.collider);
 
-const staticBodies = [];
-
-const tiles = map.layers[0].data;
-for (var index = 0; index < tiles.length; index++) {
-    if (tiles[index] !== 0) {
-        var x = index % map.width;
-        var y = Math.floor(index / map.height);
-        staticBodies.push(new Rectangle(TILE_SIZE * x, TILE_SIZE * y, TILE_SIZE, TILE_SIZE));
-    }
-}
-
+const rooms = loadMap(map, TILE_SIZE);
 const mouse = {x: 0, y: 0};
 
 window.onkeydown = function(event) {
@@ -78,6 +67,8 @@ function draw(context) {
     context.fillStyle = "CornflowerBlue";
     context.fillRect(0, 0, WIDTH, HEIGHT);
 
+    context.translate(-1 * (player.getX() - WIDTH / 2), -1 * (player.getY() - HEIGHT / 2));
+
     context.fillStyle = "white";
     context.beginPath();
     context.ellipse(player.getX(), player.getY(), player.getWidth(), player.getHeight(), 0, 0, 360);
@@ -85,13 +76,19 @@ function draw(context) {
     context.fill();
 
     context.fillStyle = "black";
-    for (var index = 0; index < staticBodies.length; index++) {
-        var rectangle = staticBodies[index];        
-        context.fillRect(rectangle.x, rectangle.y, rectangle.width, rectangle.height);
+    
+    for (var roomIndex = 0; roomIndex < rooms.length; roomIndex++) {
+        const room = rooms[roomIndex];
+        for (var bodyIndex = 0; bodyIndex < room.staticBodies.length; bodyIndex++) {
+            var rectangle = room.staticBodies[bodyIndex];        
+            context.fillRect(rectangle.x, rectangle.y, rectangle.width, rectangle.height);
+        }
     }
 
-    context.fillStyle = generateLightGradient(context);
-    context.fillRect(0, 0, WIDTH, HEIGHT);5
+    //context.fillStyle = generateLightGradient(context);
+    //context.fillRect(0, 0, WIDTH, HEIGHT);5
+
+    context.setTransform(1, 0, 0, 1, 0, 0);
 }
 
 function generateLightGradient(context) {
@@ -105,9 +102,13 @@ function generateLightGradient(context) {
 function resolveCollisions() {
     for (var dynamicIndex = 0; dynamicIndex < dynamicBodies.length; dynamicIndex++) {
         var dynamicBody = dynamicBodies[dynamicIndex];
-        for (var staticIndex = 0; staticIndex < staticBodies.length; staticIndex++) {
-            var staticBody = staticBodies[staticIndex];
-            resolveCollision(dynamicBody, staticBody);
+
+        for (var roomIndex = 0; roomIndex < rooms.length; roomIndex++) {
+            const room = rooms[roomIndex];
+            for (var bodyIndex = 0; bodyIndex < room.staticBodies.length; bodyIndex++) {
+                var staticBody = room.staticBodies[bodyIndex];
+                resolveCollision(dynamicBody, staticBody);
+            }
         }
     }
 }
@@ -122,12 +123,8 @@ function resolveCollision(circle, rectangle) {
         const distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
         const normalisedX = deltaX / distance;
         const normalisedY = deltaY / distance;
-        circle.x = nearestX + normalisedX * circle.radius;
-        circle.y = nearestY + normalisedY * circle.radius;
-
-        const circleCurrentSpeed = Math.sqrt((circle.velocity.y * circle.velocity.y) + (circle.velocity.x * circle.velocity.x));
-        circle.velocity.x = normalisedX * circleCurrentSpeed * 0.4;
-        circle.velocity.y = normalisedY * circleCurrentSpeed * 0.4;
+        circle.x = Math.floor(nearestX + normalisedX * circle.radius);
+        circle.y = Math.floor(nearestY + normalisedY * circle.radius);
     }
 }
 
