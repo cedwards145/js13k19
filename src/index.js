@@ -1,6 +1,5 @@
 import { Player } from "./player";
-import { Rectangle } from "./rectangle";
-import map from "../map.json";
+import mapData from "../map.json";
 import { loadMap } from "./maploader";
 
 const WIDTH = 1280;
@@ -20,7 +19,10 @@ const keys = {};
 const dynamicBodies = [];
 dynamicBodies.push(player.collider);
 
-const rooms = loadMap(map);
+const map = loadMap(mapData);
+const rooms = map.rooms;
+const doors = map.doors;
+
 console.log(rooms);
 const mouse = {x: 0, y: 0};
 
@@ -78,12 +80,18 @@ function draw(context) {
 
     context.fillStyle = "black";
     
-    for (var roomIndex = 0; roomIndex < rooms.length; roomIndex++) {
+    for (let roomIndex = 0; roomIndex < rooms.length; roomIndex++) {
         const room = rooms[roomIndex];
-        for (var bodyIndex = 0; bodyIndex < room.staticBodies.length; bodyIndex++) {
-            var rectangle = room.staticBodies[bodyIndex];        
+        for (let bodyIndex = 0; bodyIndex < room.staticBodies.length; bodyIndex++) {
+            const rectangle = room.staticBodies[bodyIndex];        
             context.fillRect(rectangle.x, rectangle.y, rectangle.width, rectangle.height);
         }
+    }
+
+    for (let doorIndex = 0; doorIndex < doors.length; doorIndex++) {
+        const door = doors[doorIndex];
+        context.fillStyle = "red";
+        context.fillRect(door.x, door.y, door.width, door.height);
     }
 
     //context.fillStyle = generateLightGradient(context);

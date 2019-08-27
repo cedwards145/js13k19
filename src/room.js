@@ -2,10 +2,10 @@ import { Rectangle } from "./rectangle";
 
 const ROOM_HEIGHT = 9;
 const ROOM_WIDTH = 9;
-const TOP_WALLS = [3, 4, 5, 7, 10, 11, 13];
-const LEFT_WALLS = [2, 3, 5, 6, 9, 10, 15];
-const BOTTOM_WALLS = [2, 4, 5, 7, 8, 9, 12];
-const RIGHT_WALLS = [2, 3, 4, 6, 8, 11, 14];
+const TOP_WALLS = [0, 3, 4, 5, 7, 10, 11, 13];
+const LEFT_WALLS = [0, 2, 3, 5, 6, 9, 10, 15];
+const BOTTOM_WALLS = [0, 2, 4, 5, 7, 8, 9, 12];
+const RIGHT_WALLS = [0, 2, 3, 4, 6, 8, 11, 14];
 const TILE_SIZE = 16;
 
 class Room {
@@ -14,13 +14,20 @@ class Room {
         this.y = y * TILE_SIZE * ROOM_WIDTH;
         this.type = type
         this.staticBodies = [];
-        
+
         this.hasTopDoor = !(TOP_WALLS.includes(type));
         this.hasBottomDoor = !(BOTTOM_WALLS.includes(type));
         this.hasLeftDoor = !(LEFT_WALLS.includes(type));
         this.hasRightDoor = !(RIGHT_WALLS.includes(type));
 
-        this.generateBodies();
+        // Special case for type 0, empty tile:
+        // Create a single body covering the whole room
+        if (type === 0) {
+            this.staticBodies.push(new Rectangle(this.x, this.y, TILE_SIZE * ROOM_WIDTH, TILE_SIZE * ROOM_HEIGHT));
+        }
+        else {
+            this.generateBodies();
+        }
     }
 
     generateBodies() {
