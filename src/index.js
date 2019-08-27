@@ -20,7 +20,8 @@ const keys = {};
 const dynamicBodies = [];
 dynamicBodies.push(player.collider);
 
-const rooms = loadMap(map, TILE_SIZE);
+const rooms = loadMap(map);
+console.log(rooms);
 const mouse = {x: 0, y: 0};
 
 window.onkeydown = function(event) {
