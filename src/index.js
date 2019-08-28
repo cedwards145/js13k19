@@ -1,6 +1,7 @@
 import { Player } from "./player";
 import mapData from "../map.json";
 import { loadMap } from "./maploader";
+import { keyDown, keyUp } from "./input";
 
 const WIDTH = 1280;
 const HEIGHT = 720;
@@ -14,7 +15,9 @@ const canvasOffset = canvas.getBoundingClientRect();
 const context = canvas.getContext("2d");
 
 const player = new Player(350, 1400);
-const keys = {};
+
+const gameObjects = [];
+gameObjects.push(player);
 
 const dynamicBodies = [];
 dynamicBodies.push(player.collider);
@@ -26,13 +29,9 @@ const doors = map.doors;
 console.log(rooms);
 const mouse = {x: 0, y: 0};
 
-window.onkeydown = function(event) {
-    keys[event.keyCode] = true;
-};
+window.onkeydown = keyDown;
 
-window.onkeyup = function(event) {
-    keys[event.keyCode] = false;
-}
+window.onkeyup = keyUp;
 
 window.addEventListener('mousemove', e => {
     mouse.x = e.clientX - canvasOffset.left;
@@ -46,23 +45,10 @@ function tick(elapsed) {
 }
 
 function update(delta) {
-    var x = 0;
-    var y = 0;
-
-    if (keys[65]) {
-        x = -1;
+    for (let index = 0; index < gameObjects.length; index++) {
+        gameObjects[index].update();
     }
-    else if (keys[68]) {
-        x = 1;
-    }
-    if (keys[87]) {
-        y = -1;
-    }
-    else if (keys[83]) {
-        y = 1;
-    }
-
-    player.move(x, y);
+    
     resolveCollisions();
 }
 
