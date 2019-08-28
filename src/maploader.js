@@ -1,4 +1,5 @@
 import { Room } from "./room";
+import { Door } from "./door";
 
 function loadMap(mapData) {
     const map = {
@@ -26,12 +27,7 @@ function loadMap(mapData) {
             
             if (neighbour) {
                 // Hard-coded coords needs fixing
-                map.doors.push({
-                    x: neighbour.x - 4,
-                    y: room.y + 64,
-                    width: 8,
-                    height: 16
-                });
+                map.doors.push(new Door(neighbour.x - 4, room.y + 64, 8, 16, false));
             }
         }
         if (room.hasBottomDoor) {
@@ -39,12 +35,7 @@ function loadMap(mapData) {
 
             if (neighbour) {
                 // Hard-coded coords needs fixing
-                map.doors.push({
-                    x: room.x + 64,
-                    y: neighbour.y - 4,
-                    width: 16,
-                    height:8
-                });
+                map.doors.push(new Door(room.x + 64, neighbour.y - 4, 16, 8, true));
             }
         }
     }

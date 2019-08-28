@@ -13,7 +13,6 @@ canvas.height = HEIGHT;
 const canvasOffset = canvas.getBoundingClientRect();
 
 const context = canvas.getContext("2d");
-
 const player = new Player(350, 1400);
 
 const gameObjects = [];
@@ -25,37 +24,40 @@ dynamicBodies.push(player.collider);
 const map = loadMap(mapData);
 const rooms = map.rooms;
 const doors = map.doors;
+for (let index = 0; index < doors.length; index++) {
+    gameObjects.push(doors[index]);
+}
 
-console.log(rooms);
 const mouse = {x: 0, y: 0};
 
+// Set up input event handlers
 window.onkeydown = keyDown;
-
 window.onkeyup = keyUp;
-
 window.addEventListener('mousemove', e => {
     mouse.x = e.clientX - canvasOffset.left;
     mouse.y = e.clientY - canvasOffset.top;
 });
 
-function tick(elapsed) {
-    update(elapsed);
-    draw(context);
-    window.requestAnimationFrame(tick);
+// Not ideal, but export a function for other game logic to find the player
+function getPlayer() {
+    return player;
 }
 
+// Game logic update
 function update(delta) {
     for (let index = 0; index < gameObjects.length; index++) {
         gameObjects[index].update();
     }
-    
+
     resolveCollisions();
 }
 
+// Main draw function
 function draw(context) {
     context.fillStyle = "CornflowerBlue";
     context.fillRect(0, 0, WIDTH, HEIGHT);
 
+    // Translate canvas co-ords to center the player on screen
     context.translate(-1 * (player.getX() - WIDTH / 2), -1 * (player.getY() - HEIGHT / 2));
 
     context.fillStyle = "white";
@@ -75,14 +77,15 @@ function draw(context) {
     }
 
     for (let doorIndex = 0; doorIndex < doors.length; doorIndex++) {
-        const door = doors[doorIndex];
+        const doorRect = doors[doorIndex].body;
         context.fillStyle = "red";
-        context.fillRect(door.x, door.y, door.width, door.height);
+        context.fillRect(doorRect.x, doorRect.y, doorRect.width, doorRect.height);
     }
 
     //context.fillStyle = generateLightGradient(context);
     //context.fillRect(0, 0, WIDTH, HEIGHT);5
 
+    // Reset context transform to identity matrix
     context.setTransform(1, 0, 0, 1, 0, 0);
 }
 
@@ -105,6 +108,11 @@ function resolveCollisions() {
                 resolveCollision(dynamicBody, staticBody);
             }
         }
+
+        for (var doorIndex = 0; doorIndex < doors.length; doorIndex++) {
+            const staticBody = doors[doorIndex].body;
+            resolveCollision(dynamicBody, staticBody);
+        }
     }
 }
 
@@ -123,4 +131,12 @@ function resolveCollision(circle, rectangle) {
     }
 }
 
+// Main game loop
+function tick(elapsed) {
+    update(elapsed);
+    draw(context);
+    window.requestAnimationFrame(tick);
+}
 tick(0);
+
+export { getPlayer };
