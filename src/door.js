@@ -1,5 +1,6 @@
 import { Rectangle } from "./rectangle";
 import { getPlayer } from ".";
+import { isKeyDown } from "./input";
 
 // Door states
 const CLOSED_STATE = 0;
@@ -15,6 +16,7 @@ class Door {
         this.body = new Rectangle(x, y, width, height);
         this.player = getPlayer();
         this.state = CLOSED_STATE;
+        this.locked = false;
 
         if (this.isHorizontal) {
             this.openX = this.x + 16;
@@ -27,14 +29,22 @@ class Door {
     }
 
     update() {
-        if (this.state === CLOSED_STATE &&
-            Math.abs(this.player.getX() - this.body.x) < 32 &&
-            Math.abs(this.player.getY() - this.body.y) < 32) {
-                this.state = OPENING_STATE;
+        const playerInRange = Math.abs(this.player.getX() - this.body.x) < 32 &&
+                              Math.abs(this.player.getY() - this.body.y) < 32;
+
+        // If player is in range and interact button pressed, toggle door lock
+        if (playerInRange && isKeyDown(69)) {
+            this.locked = !this.locked;
         }
-        else if (this.state === OPEN_STATE && 
-                 (Math.abs(this.player.getX() - this.body.x) > 32 ||
-                  Math.abs(this.player.getY() - this.body.y) > 32)) {
+
+        // If door is closed, unlocked, and the player is in range, open it.
+        // Doors should automatically open for the player
+        if (this.state === CLOSED_STATE && !this.locked && playerInRange) {
+            this.state = OPENING_STATE;
+        }
+        // If door is open, it closes if the player is not in range, or the door is
+        // locked
+        else if (this.state === OPEN_STATE && (!playerInRange || this.locked)) {
             this.state = CLOSING_STATE;
         }
 
@@ -64,6 +74,8 @@ class Door {
             }
         }
         
+        // Move actual position towards target position if not already there
+        // DOESN'T HANDLE OVERSHOOT!
         if (this.body.x !== targetX) {
             const deltaX = targetX - this.body.x;
             this.body.x += Math.sign(deltaX) * 2;

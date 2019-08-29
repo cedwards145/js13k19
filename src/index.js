@@ -77,9 +77,14 @@ function draw(context) {
     }
 
     for (let doorIndex = 0; doorIndex < doors.length; doorIndex++) {
-        const doorRect = doors[doorIndex].body;
-        context.fillStyle = "red";
-        context.fillRect(doorRect.x, doorRect.y, doorRect.width, doorRect.height);
+        const door = doors[doorIndex];
+        if (door.locked) {
+            context.fillStyle = "red";
+        }
+        else {
+            context.fillStyle = "green";
+        }
+        context.fillRect(door.body.x, door.body.y, door.body.width, door.body.height);
     }
 
     //context.fillStyle = generateLightGradient(context);
