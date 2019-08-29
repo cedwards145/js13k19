@@ -1,6 +1,6 @@
 import { Rectangle } from "./rectangle";
 import { getPlayer } from ".";
-import { isKeyDown } from "./input";
+import { isKeyPressed } from "./input";
 
 // Door states
 const CLOSED_STATE = 0;
@@ -33,7 +33,7 @@ class Door {
                               Math.abs(this.player.getY() - this.body.y) < 32;
 
         // If player is in range and interact button pressed, toggle door lock
-        if (playerInRange && isKeyDown(69)) {
+        if (playerInRange && isKeyPressed(69)) {
             this.locked = !this.locked;
         }
 

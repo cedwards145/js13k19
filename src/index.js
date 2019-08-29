@@ -1,7 +1,7 @@
 import { Player } from "./player";
 import mapData from "../map.json";
 import { loadMap } from "./maploader";
-import { keyDown, keyUp } from "./input";
+import { keyDown, keyUp, clearPressedKeys } from "./input";
 
 const WIDTH = 1280;
 const HEIGHT = 720;
@@ -50,6 +50,7 @@ function update(delta) {
     }
 
     resolveCollisions();
+    clearPressedKeys();
 }
 
 // Main draw function
