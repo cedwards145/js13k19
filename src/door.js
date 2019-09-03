@@ -1,6 +1,7 @@
 import { Rectangle } from "./rectangle";
 import { getPlayer } from ".";
 import { isKeyPressed } from "./input";
+import { GameObject } from "./gameobject";
 
 // Door states
 const CLOSED_STATE = 0;
@@ -8,8 +9,9 @@ const OPENING_STATE = 1;
 const OPEN_STATE = 2;
 const CLOSING_STATE = 3;
 
-class Door {
+class Door extends GameObject {
     constructor(x, y, width, height, isHorizontal) {
+        super();
         this.x = x;
         this.y = y;
         this.isHorizontal = isHorizontal
@@ -85,6 +87,16 @@ class Door {
             const deltaY = targetY - this.body.y;
             this.body.y += Math.sign(deltaY) * 2;
         }
+    }
+
+    draw(context) {
+        if (this.locked) {
+            context.fillStyle = "red";
+        }
+        else {
+            context.fillStyle = "green";
+        }
+        context.fillRect(this.body.x, this.body.y, this.body.width, this.body.height);
     }
 }
 

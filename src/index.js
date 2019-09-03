@@ -2,6 +2,8 @@ import { Player } from "./player";
 import mapData from "../map.json";
 import { loadMap } from "./maploader";
 import { keyDown, keyUp, clearPressedKeys } from "./input";
+import { Enemy } from "./enemy";
+import { Circle } from "./circle";
 
 const WIDTH = 1280;
 const HEIGHT = 720;
@@ -17,9 +19,17 @@ const player = new Player(350, 1400);
 
 const gameObjects = [];
 gameObjects.push(player);
+gameObjects.push(new Enemy(350, 1400));
 
+// Search all game objects for any circle colliders, and add them to a list
+// of dynamic bodies for use in collision resolution
 const dynamicBodies = [];
-dynamicBodies.push(player.collider);
+for (let index = 0; index < gameObjects.length; index++) {
+    const collider = gameObjects[index].collider;
+    if (collider && collider instanceof Circle) {
+        dynamicBodies.push(collider);
+    }
+}
 
 const map = loadMap(mapData);
 const rooms = map.rooms;
@@ -60,15 +70,8 @@ function draw(context) {
 
     // Translate canvas co-ords to center the player on screen
     context.translate(-1 * (player.getX() - WIDTH / 2), -1 * (player.getY() - HEIGHT / 2));
-
-    context.fillStyle = "white";
-    context.beginPath();
-    context.ellipse(player.getX(), player.getY(), player.getWidth(), player.getHeight(), 0, 0, 360);
-    context.closePath();
-    context.fill();
-
-    context.fillStyle = "black";
     
+    context.fillStyle = "black";
     for (let roomIndex = 0; roomIndex < rooms.length; roomIndex++) {
         const room = rooms[roomIndex];
         for (let bodyIndex = 0; bodyIndex < room.staticBodies.length; bodyIndex++) {
@@ -77,17 +80,10 @@ function draw(context) {
         }
     }
 
-    for (let doorIndex = 0; doorIndex < doors.length; doorIndex++) {
-        const door = doors[doorIndex];
-        if (door.locked) {
-            context.fillStyle = "red";
-        }
-        else {
-            context.fillStyle = "green";
-        }
-        context.fillRect(door.body.x, door.body.y, door.body.width, door.body.height);
+    for (let gameObjectIndex = 0; gameObjectIndex < gameObjects.length; gameObjectIndex++) {
+        gameObjects[gameObjectIndex].draw(context);
     }
-
+    
     //context.fillStyle = generateLightGradient(context);
     //context.fillRect(0, 0, WIDTH, HEIGHT);5
 

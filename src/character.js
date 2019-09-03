@@ -28,6 +28,14 @@ class Character extends GameObject {
         this.collider.x += x * this.speed;
         this.collider.y += y * this.speed;
     }
+
+    draw(context) {
+        context.fillStyle = "white";
+        context.beginPath();
+        context.ellipse(this.getX(), this.getY(), this.getWidth(), this.getHeight(), 0, 0, 360);
+        context.closePath();
+        context.fill();
+    }
 }
 
 export { Character };

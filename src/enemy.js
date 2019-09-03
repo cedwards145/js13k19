@@ -3,7 +3,7 @@ import { getPlayer } from ".";
 
 class Enemy extends Character {
     constructor(x, y) {
-        super(x, y, 7);
+        super(x, y, 7, 1);
     }
 
     update() {
