@@ -4,6 +4,7 @@ import { loadMap } from "./maploader";
 import { keyDown, keyUp, clearPressedKeys } from "./input";
 import { Enemy } from "./enemy";
 import { Circle } from "./circle";
+import { Rectangle } from "./rectangle";
 
 const WIDTH = 1280;
 const HEIGHT = 720;
@@ -21,22 +22,37 @@ const gameObjects = [];
 gameObjects.push(player);
 gameObjects.push(new Enemy(350, 1400));
 
-// Search all game objects for any circle colliders, and add them to a list
-// of dynamic bodies for use in collision resolution
-const dynamicBodies = [];
-for (let index = 0; index < gameObjects.length; index++) {
-    const collider = gameObjects[index].collider;
-    if (collider && collider instanceof Circle) {
-        dynamicBodies.push(collider);
-    }
-}
-
 const map = loadMap(mapData);
 const rooms = map.rooms;
 const doors = map.doors;
+for (let index = 0; index < rooms.length; index++) {
+    gameObjects.push(rooms[index]);
+}
 for (let index = 0; index < doors.length; index++) {
     gameObjects.push(doors[index]);
 }
+
+// Build up lists of colliders for use in physics simulation.
+// Separate out circle colliders which will be dynamic from
+// rectangles which are static.
+// (Static colliders don't get moved by collision resolution,
+// dynamic ones do)
+const dynamicBodies = [];
+const staticBodies = [];
+
+for (let index = 0; index < gameObjects.length; index++) {
+    const collider = gameObjects[index].collider;
+    if (collider) {
+        if (collider instanceof Circle) {
+            dynamicBodies.push(collider);
+        }
+        else if (collider instanceof Rectangle) {
+            staticBodies.push(collider);
+        }
+    }
+}
+
+console.log(dynamicBodies);
 
 const mouse = {x: 0, y: 0};
 
@@ -83,7 +99,7 @@ function draw(context) {
     for (let gameObjectIndex = 0; gameObjectIndex < gameObjects.length; gameObjectIndex++) {
         gameObjects[gameObjectIndex].draw(context);
     }
-    
+
     //context.fillStyle = generateLightGradient(context);
     //context.fillRect(0, 0, WIDTH, HEIGHT);5
 
@@ -100,19 +116,11 @@ function generateLightGradient(context) {
 }
 
 function resolveCollisions() {
-    for (var dynamicIndex = 0; dynamicIndex < dynamicBodies.length; dynamicIndex++) {
-        var dynamicBody = dynamicBodies[dynamicIndex];
+    for (let dynamicIndex = 0; dynamicIndex < dynamicBodies.length; dynamicIndex++) {
+        const dynamicBody = dynamicBodies[dynamicIndex];
 
-        for (var roomIndex = 0; roomIndex < rooms.length; roomIndex++) {
-            const room = rooms[roomIndex];
-            for (var bodyIndex = 0; bodyIndex < room.staticBodies.length; bodyIndex++) {
-                var staticBody = room.staticBodies[bodyIndex];
-                resolveCollision(dynamicBody, staticBody);
-            }
-        }
-
-        for (var doorIndex = 0; doorIndex < doors.length; doorIndex++) {
-            const staticBody = doors[doorIndex].body;
+        for (let staticBodyIndex = 0; staticBodyIndex < staticBodies.length; staticBodyIndex++) {
+            const staticBody = staticBodies[staticBodyIndex];
             resolveCollision(dynamicBody, staticBody);
         }
     }

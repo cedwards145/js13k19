@@ -1,4 +1,5 @@
 import { Rectangle } from "./rectangle";
+import { GameObject } from "./gameobject";
 
 const ROOM_HEIGHT = 9;
 const ROOM_WIDTH = 9;
@@ -8,8 +9,9 @@ const BOTTOM_WALLS = [0, 2, 4, 5, 7, 8, 9, 12];
 const RIGHT_WALLS = [0, 2, 3, 4, 6, 8, 11, 14];
 const TILE_SIZE = 16;
 
-class Room {
+class Room extends GameObject {
     constructor(x, y, type) {
+        super();
         this.x = x * TILE_SIZE * ROOM_WIDTH;
         this.y = y * TILE_SIZE * ROOM_WIDTH;
         this.type = type

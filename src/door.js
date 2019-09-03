@@ -15,7 +15,7 @@ class Door extends GameObject {
         this.x = x;
         this.y = y;
         this.isHorizontal = isHorizontal
-        this.body = new Rectangle(x, y, width, height);
+        this.collider = new Rectangle(x, y, width, height);
         this.player = getPlayer();
         this.state = CLOSED_STATE;
         this.locked = false;
@@ -31,8 +31,8 @@ class Door extends GameObject {
     }
 
     update() {
-        const playerInRange = Math.abs(this.player.getX() - this.body.x) < 32 &&
-                              Math.abs(this.player.getY() - this.body.y) < 32;
+        const playerInRange = Math.abs(this.player.getX() - this.collider.x) < 32 &&
+                              Math.abs(this.player.getY() - this.collider.y) < 32;
 
         // If player is in range and interact button pressed, toggle door lock
         if (playerInRange && isKeyPressed(69)) {
@@ -51,14 +51,14 @@ class Door extends GameObject {
         }
 
         // By default, door doesn't need to move so set target to current position
-        let targetX = this.body.x;
-        let targetY = this.body.y;
+        let targetX = this.collider.x;
+        let targetY = this.collider.y;
 
         // If the door is opening or closing, and hasn't finished,
         // set the target to the open or closed position.
         // If it has finished, change state
         if (this.state === OPENING_STATE) {
-            if (this.body.x === this.openX && this.body.y === this.openY) {
+            if (this.collider.x === this.openX && this.collider.y === this.openY) {
                 this.state = OPEN_STATE;
             }
             else {
@@ -67,7 +67,7 @@ class Door extends GameObject {
             }
         }
         else if (this.state === CLOSING_STATE) {
-            if (this.body.x === this.x && this.body.y === this.y) {
+            if (this.collider.x === this.x && this.collider.y === this.y) {
                 this.state = CLOSED_STATE;
             }
             else {
@@ -78,14 +78,14 @@ class Door extends GameObject {
         
         // Move actual position towards target position if not already there
         // DOESN'T HANDLE OVERSHOOT!
-        if (this.body.x !== targetX) {
-            const deltaX = targetX - this.body.x;
-            this.body.x += Math.sign(deltaX) * 2;
+        if (this.collider.x !== targetX) {
+            const deltaX = targetX - this.collider.x;
+            this.collider.x += Math.sign(deltaX) * 2;
         } 
         
-        if (this.body.y !== targetY) {
-            const deltaY = targetY - this.body.y;
-            this.body.y += Math.sign(deltaY) * 2;
+        if (this.collider.y !== targetY) {
+            const deltaY = targetY - this.collider.y;
+            this.collider.y += Math.sign(deltaY) * 2;
         }
     }
 
@@ -96,7 +96,7 @@ class Door extends GameObject {
         else {
             context.fillStyle = "green";
         }
-        context.fillRect(this.body.x, this.body.y, this.body.width, this.body.height);
+        context.fillRect(this.collider.x, this.collider.y, this.collider.width, this.collider.height);
     }
 }
 
