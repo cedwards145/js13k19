@@ -6,6 +6,7 @@ class Character extends GameObject {
         super();
         this.speed = speed;
         this.collider = new Circle(x + radius, y + radius, radius);
+        this.colliders.push(this.collider);
     }
 
     getX() {

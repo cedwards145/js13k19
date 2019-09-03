@@ -41,18 +41,19 @@ const dynamicBodies = [];
 const staticBodies = [];
 
 for (let index = 0; index < gameObjects.length; index++) {
-    const collider = gameObjects[index].collider;
-    if (collider) {
-        if (collider instanceof Circle) {
-            dynamicBodies.push(collider);
-        }
-        else if (collider instanceof Rectangle) {
-            staticBodies.push(collider);
+    const gameObject = gameObjects[index];
+    for (let colliderIndex = 0; colliderIndex < gameObject.colliders.length; colliderIndex++) {
+        const collider = gameObject.colliders[colliderIndex];
+        if (collider) {
+            if (collider instanceof Circle) {
+                dynamicBodies.push(collider);
+            }
+            else if (collider instanceof Rectangle) {
+                staticBodies.push(collider);
+            }
         }
     }
 }
-
-console.log(dynamicBodies);
 
 const mouse = {x: 0, y: 0};
 
@@ -87,15 +88,6 @@ function draw(context) {
     // Translate canvas co-ords to center the player on screen
     context.translate(-1 * (player.getX() - WIDTH / 2), -1 * (player.getY() - HEIGHT / 2));
     
-    context.fillStyle = "black";
-    for (let roomIndex = 0; roomIndex < rooms.length; roomIndex++) {
-        const room = rooms[roomIndex];
-        for (let bodyIndex = 0; bodyIndex < room.staticBodies.length; bodyIndex++) {
-            const rectangle = room.staticBodies[bodyIndex];        
-            context.fillRect(rectangle.x, rectangle.y, rectangle.width, rectangle.height);
-        }
-    }
-
     for (let gameObjectIndex = 0; gameObjectIndex < gameObjects.length; gameObjectIndex++) {
         gameObjects[gameObjectIndex].draw(context);
     }

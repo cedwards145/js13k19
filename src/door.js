@@ -16,6 +16,7 @@ class Door extends GameObject {
         this.y = y;
         this.isHorizontal = isHorizontal
         this.collider = new Rectangle(x, y, width, height);
+        this.colliders.push(this.collider);
         this.player = getPlayer();
         this.state = CLOSED_STATE;
         this.locked = false;

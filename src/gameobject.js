@@ -1,5 +1,7 @@
 class GameObject {
-    constructor() {}
+    constructor() {
+        this.colliders = [];
+    }
 
     update() {}
 

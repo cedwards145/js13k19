@@ -15,7 +15,6 @@ class Room extends GameObject {
         this.x = x * TILE_SIZE * ROOM_WIDTH;
         this.y = y * TILE_SIZE * ROOM_WIDTH;
         this.type = type
-        this.staticBodies = [];
 
         this.hasTopDoor = !(TOP_WALLS.includes(type));
         this.hasBottomDoor = !(BOTTOM_WALLS.includes(type));
@@ -25,7 +24,7 @@ class Room extends GameObject {
         // Special case for type 0, empty tile:
         // Create a single body covering the whole room
         if (type === 0) {
-            this.staticBodies.push(new Rectangle(this.x, this.y, TILE_SIZE * ROOM_WIDTH, TILE_SIZE * ROOM_HEIGHT));
+            this.colliders.push(new Rectangle(this.x, this.y, TILE_SIZE * ROOM_WIDTH, TILE_SIZE * ROOM_HEIGHT));
         }
         else {
             this.generateBodies();
@@ -40,12 +39,12 @@ class Room extends GameObject {
             // Top walls
             // Place wall if the cell isn't the center, or it is the center but this tile type has a wall at the top
             if (!isCenter || !this.hasTopDoor) {
-                this.staticBodies.push(new Rectangle(this.x + (x * TILE_SIZE), this.y, TILE_SIZE, TILE_SIZE));
+                this.colliders.push(new Rectangle(this.x + (x * TILE_SIZE), this.y, TILE_SIZE, TILE_SIZE));
             }
 
             // Botom walls, same logic as above
             if (!isCenter || !this.hasBottomDoor) {
-                this.staticBodies.push(new Rectangle(this.x + (x * TILE_SIZE), this.y + ((ROOM_HEIGHT - 1) * TILE_SIZE), TILE_SIZE, TILE_SIZE));
+                this.colliders.push(new Rectangle(this.x + (x * TILE_SIZE), this.y + ((ROOM_HEIGHT - 1) * TILE_SIZE), TILE_SIZE, TILE_SIZE));
             }
         }
 
@@ -56,12 +55,20 @@ class Room extends GameObject {
 
             // Left walls
             if (!isCenter || !this.hasLeftDoor) {
-                this.staticBodies.push(new Rectangle(this.x, this.y + (y * TILE_SIZE), TILE_SIZE, TILE_SIZE));
+                this.colliders.push(new Rectangle(this.x, this.y + (y * TILE_SIZE), TILE_SIZE, TILE_SIZE));
             }
 
             if (!isCenter || !this.hasRightDoor) {
-                this.staticBodies.push(new Rectangle(this.x + ((ROOM_WIDTH - 1) * TILE_SIZE), this.y + (y * TILE_SIZE), TILE_SIZE, TILE_SIZE));
+                this.colliders.push(new Rectangle(this.x + ((ROOM_WIDTH - 1) * TILE_SIZE), this.y + (y * TILE_SIZE), TILE_SIZE, TILE_SIZE));
             }
+        }
+    }
+
+    draw(context) {
+        context.fillStyle = "black";
+        for (let bodyIndex = 0; bodyIndex < this.colliders.length; bodyIndex++) {
+            const rectangle = this.colliders[bodyIndex];        
+            context.fillRect(rectangle.x, rectangle.y, rectangle.width, rectangle.height);
         }
     }
 }
