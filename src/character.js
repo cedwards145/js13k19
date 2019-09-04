@@ -6,7 +6,6 @@ class Character extends GameObject {
         super();
         this.speed = speed;
         this.collider = new Circle(x + radius, y + radius, radius);
-        this.colliders.push(this.collider);
     }
 
     getX() {
@@ -36,6 +35,10 @@ class Character extends GameObject {
         context.ellipse(this.getX(), this.getY(), this.getWidth(), this.getHeight(), 0, 0, 360);
         context.closePath();
         context.fill();
+    }
+
+    getColliders() {
+        return [this.collider];
     }
 }
 

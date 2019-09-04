@@ -39,19 +39,24 @@ for (let index = 0; index < doors.length; index++) {
 // dynamic ones do)
 const dynamicBodies = [];
 const staticBodies = [];
+const triggers = [];
 
 for (let index = 0; index < gameObjects.length; index++) {
-    const gameObject = gameObjects[index];
-    for (let colliderIndex = 0; colliderIndex < gameObject.colliders.length; colliderIndex++) {
-        const collider = gameObject.colliders[colliderIndex];
-        if (collider) {
-            if (collider instanceof Circle) {
-                dynamicBodies.push(collider);
-            }
-            else if (collider instanceof Rectangle) {
-                staticBodies.push(collider);
-            }
+    const colliders = gameObjects[index].getColliders();
+    console.log(colliders);
+    for (let colliderIndex = 0; colliderIndex < colliders.length; colliderIndex++) {
+        const collider = colliders[colliderIndex];
+        if (collider instanceof Circle) {
+            dynamicBodies.push(collider);
         }
+        else if (collider instanceof Rectangle) {
+            staticBodies.push(collider);
+        }
+    }
+
+    const currentTriggers = gameObjects[index].getTriggers();
+    for (let triggerIndex = 0; triggerIndex < currentTriggers.length; triggerIndex++) {
+        triggers.push(currentTriggers[triggerIndex]);
     }
 }
 
@@ -115,6 +120,13 @@ function resolveCollisions() {
             const staticBody = staticBodies[staticBodyIndex];
             resolveCollision(dynamicBody, staticBody);
         }
+
+        for (let triggerIndex = 0; triggerIndex < triggers.length; triggerIndex++) {
+            const trigger = triggers[triggerIndex];
+            if (collides(dynamicBody, trigger)) {
+                trigger.onCollision(dynamicBody);
+            }
+        }
     }
 }
 
@@ -131,6 +143,18 @@ function resolveCollision(circle, rectangle) {
         circle.x = Math.floor(nearestX + normalisedX * circle.radius);
         circle.y = Math.floor(nearestY + normalisedY * circle.radius);
     }
+}
+
+// Same as resolveCollision but without the resolution.
+// If collision resolution didn't need values from collision detection,
+// code could be shared. TODO: optimise?
+function collides(circle, rectangle) {
+    const nearestX = Math.max(rectangle.x, Math.min(circle.x, rectangle.x + rectangle.width));
+    const nearestY = Math.max(rectangle.y, Math.min(circle.y, rectangle.y + rectangle.height));
+    const deltaX = circle.x - nearestX;
+    const deltaY = circle.y - nearestY;
+    
+    return (deltaX * deltaX + deltaY * deltaY) < (circle.radius * circle.radius);
 }
 
 // Main game loop

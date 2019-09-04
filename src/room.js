@@ -20,6 +20,7 @@ class Room extends GameObject {
         this.hasBottomDoor = !(BOTTOM_WALLS.includes(type));
         this.hasLeftDoor = !(LEFT_WALLS.includes(type));
         this.hasRightDoor = !(RIGHT_WALLS.includes(type));
+        this.colliders = [];
 
         // Special case for type 0, empty tile:
         // Create a single body covering the whole room
@@ -70,6 +71,10 @@ class Room extends GameObject {
             const rectangle = this.colliders[bodyIndex];        
             context.fillRect(rectangle.x, rectangle.y, rectangle.width, rectangle.height);
         }
+    }
+
+    getColliders() {
+        return this.colliders;
     }
 }
 

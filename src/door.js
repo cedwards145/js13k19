@@ -16,10 +16,15 @@ class Door extends GameObject {
         this.y = y;
         this.isHorizontal = isHorizontal
         this.collider = new Rectangle(x, y, width, height);
-        this.colliders.push(this.collider);
         this.player = getPlayer();
         this.state = CLOSED_STATE;
         this.locked = false;
+
+        this.hasBeenTriggered = false;
+        this.trigger = new Rectangle(x - 16, y - 16, width + 32, height + 32);
+        this.trigger.onCollision = (other) => {
+            this.hasBeenTriggered = true;
+        }
 
         if (this.isHorizontal) {
             this.openX = this.x + 16;
@@ -42,12 +47,12 @@ class Door extends GameObject {
 
         // If door is closed, unlocked, and the player is in range, open it.
         // Doors should automatically open for the player
-        if (this.state === CLOSED_STATE && !this.locked && playerInRange) {
+        if (this.state === CLOSED_STATE && !this.locked && this.hasBeenTriggered) {
             this.state = OPENING_STATE;
         }
         // If door is open, it closes if the player is not in range, or the door is
         // locked
-        else if (this.state === OPEN_STATE && (!playerInRange || this.locked)) {
+        else if (this.state === OPEN_STATE && (!this.hasBeenTriggered || this.locked)) {
             this.state = CLOSING_STATE;
         }
 
@@ -88,6 +93,8 @@ class Door extends GameObject {
             const deltaY = targetY - this.collider.y;
             this.collider.y += Math.sign(deltaY) * 2;
         }
+
+        this.hasBeenTriggered = false;
     }
 
     draw(context) {
@@ -98,6 +105,14 @@ class Door extends GameObject {
             context.fillStyle = "green";
         }
         context.fillRect(this.collider.x, this.collider.y, this.collider.width, this.collider.height);
+    }
+
+    getColliders() {
+        return [this.collider];
+    }
+
+    getTriggers() {
+        return [this.trigger];
     }
 }
 
