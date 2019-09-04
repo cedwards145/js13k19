@@ -3,6 +3,8 @@ import { Door } from "./door";
 
 function loadMap(mapData) {
     const map = {
+        width: mapData.width,
+        height: mapData.height,
         rooms: [],
         doors: []
     };
@@ -27,7 +29,7 @@ function loadMap(mapData) {
             
             if (neighbour) {
                 // Hard-coded coords needs fixing
-                map.doors.push(new Door(neighbour.x - 4, room.y + 64, 8, 16, false));
+                map.doors.push(new Door(neighbour.left - 4, room.top + 64, 8, 16, false));
             }
         }
         if (room.hasBottomDoor) {
@@ -35,7 +37,7 @@ function loadMap(mapData) {
 
             if (neighbour) {
                 // Hard-coded coords needs fixing
-                map.doors.push(new Door(room.x + 64, neighbour.y - 4, 16, 8, true));
+                map.doors.push(new Door(room.left + 64, neighbour.top - 4, 16, 8, true));
             }
         }
     }

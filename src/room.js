@@ -12,9 +12,14 @@ const TILE_SIZE = 16;
 class Room extends GameObject {
     constructor(x, y, type) {
         super();
-        this.x = x * TILE_SIZE * ROOM_WIDTH;
-        this.y = y * TILE_SIZE * ROOM_WIDTH;
+        // Store info read from map data
+        this.x = x;
+        this.y = y
         this.type = type
+
+        // Calculate left and top coords in pixels
+        this.left = x * TILE_SIZE * ROOM_WIDTH;
+        this.top = y * TILE_SIZE * ROOM_WIDTH;
 
         this.hasTopDoor = !(TOP_WALLS.includes(type));
         this.hasBottomDoor = !(BOTTOM_WALLS.includes(type));
@@ -25,7 +30,7 @@ class Room extends GameObject {
         // Special case for type 0, empty tile:
         // Create a single body covering the whole room
         if (type === 0) {
-            this.colliders.push(new Rectangle(this.x, this.y, TILE_SIZE * ROOM_WIDTH, TILE_SIZE * ROOM_HEIGHT));
+            this.colliders.push(new Rectangle(this.left, this.top, TILE_SIZE * ROOM_WIDTH, TILE_SIZE * ROOM_HEIGHT));
         }
         else {
             this.generateBodies();
@@ -40,12 +45,12 @@ class Room extends GameObject {
             // Top walls
             // Place wall if the cell isn't the center, or it is the center but this tile type has a wall at the top
             if (!isCenter || !this.hasTopDoor) {
-                this.colliders.push(new Rectangle(this.x + (x * TILE_SIZE), this.y, TILE_SIZE, TILE_SIZE));
+                this.colliders.push(new Rectangle(this.left + (x * TILE_SIZE), this.top, TILE_SIZE, TILE_SIZE));
             }
 
             // Botom walls, same logic as above
             if (!isCenter || !this.hasBottomDoor) {
-                this.colliders.push(new Rectangle(this.x + (x * TILE_SIZE), this.y + ((ROOM_HEIGHT - 1) * TILE_SIZE), TILE_SIZE, TILE_SIZE));
+                this.colliders.push(new Rectangle(this.left + (x * TILE_SIZE), this.top + ((ROOM_HEIGHT - 1) * TILE_SIZE), TILE_SIZE, TILE_SIZE));
             }
         }
 
@@ -56,11 +61,11 @@ class Room extends GameObject {
 
             // Left walls
             if (!isCenter || !this.hasLeftDoor) {
-                this.colliders.push(new Rectangle(this.x, this.y + (y * TILE_SIZE), TILE_SIZE, TILE_SIZE));
+                this.colliders.push(new Rectangle(this.left, this.top + (y * TILE_SIZE), TILE_SIZE, TILE_SIZE));
             }
 
             if (!isCenter || !this.hasRightDoor) {
-                this.colliders.push(new Rectangle(this.x + ((ROOM_WIDTH - 1) * TILE_SIZE), this.y + (y * TILE_SIZE), TILE_SIZE, TILE_SIZE));
+                this.colliders.push(new Rectangle(this.left + ((ROOM_WIDTH - 1) * TILE_SIZE), this.top + (y * TILE_SIZE), TILE_SIZE, TILE_SIZE));
             }
         }
     }
