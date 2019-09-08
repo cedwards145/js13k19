@@ -1,5 +1,9 @@
+import { getGame } from ".";
+
 class GameObject {
-    constructor() {}
+    constructor() {
+        this.game = getGame();
+    }
 
     update() {}
 

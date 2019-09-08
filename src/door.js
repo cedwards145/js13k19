@@ -1,5 +1,5 @@
 import { Rectangle } from "./rectangle";
-import { getPlayer } from ".";
+import { getPlayer } from "./game";
 import { isKeyPressed } from "./input";
 import { GameObject } from "./gameobject";
 
@@ -16,7 +16,6 @@ class Door extends GameObject {
         this.y = y;
         this.isHorizontal = isHorizontal
         this.collider = new Rectangle(x, y, width, height);
-        this.player = getPlayer();
         this.state = CLOSED_STATE;
         this.locked = false;
 
@@ -37,8 +36,9 @@ class Door extends GameObject {
     }
 
     update() {
-        const playerInRange = Math.abs(this.player.getX() - this.collider.x) < 32 &&
-                              Math.abs(this.player.getY() - this.collider.y) < 32;
+        const player = this.game.getPlayer();
+        const playerInRange = Math.abs(player.getX() - this.collider.x) < 32 &&
+                              Math.abs(player.getY() - this.collider.y) < 32;
 
         // If player is in range and interact button pressed, toggle door lock
         if (playerInRange && isKeyPressed(69)) {

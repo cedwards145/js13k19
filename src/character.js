@@ -8,6 +8,14 @@ class Character extends GameObject {
         this.collider = new Circle(x + radius, y + radius, radius);
     }
 
+    setX(x) {
+        this.collider.x = x;
+    }
+
+    setY(y) {
+        this.collider.y = y;
+    }
+
     getX() {
         return this.collider.x;
     }

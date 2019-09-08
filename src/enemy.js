@@ -1,5 +1,4 @@
 import { Character } from "./character";
-import { getPlayer } from ".";
 
 class Enemy extends Character {
     constructor(x, y) {
@@ -7,7 +6,7 @@ class Enemy extends Character {
     }
 
     update() {
-        const player = getPlayer();
+        const player = this.game.getPlayer();
         const deltaX = player.getX() - this.getX();
         const deltaY = player.getY() - this.getY();
 
