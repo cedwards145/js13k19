@@ -4,6 +4,7 @@ import { Player } from "./player";
 import { Rectangle } from "./rectangle";
 import { Room } from "./room";
 import { Enemy } from "./enemy";
+import { TILE_SIZE, ROOM_HEIGHT, ROOM_WIDTH } from "./constants";
 
 class Game {
     constructor(width, height) {
@@ -27,9 +28,21 @@ class Game {
         this.rooms = this.map.rooms;
         this.doors = this.map.doors;
 
+        // Build up structures for pathfinding
+        // RoomsByCoord maps an x, y pair to a room at that location,
+        // DistanceMap maps an x, y pair to the distance that room is from the player
+        this.roomsByCoord = {};
+        this.distanceMap = {};
+        for (let x = 0; x < this.map.width; x++) {
+            this.roomsByCoord[x] = {};
+            this.distanceMap[x] = {};
+        }
+
         // Add all doors and rooms to the list of game objects
         for (let index = 0; index < this.rooms.length; index++) {
-            this.addGameObject(this.rooms[index]);
+            const room = this.rooms[index];
+            this.roomsByCoord[room.x][room.y] = room;
+            this.addGameObject(room);
         }
         for (let index = 0; index < this.doors.length; index++) {
             this.addGameObject(this.doors[index]);
@@ -59,6 +72,15 @@ class Game {
         }
     }
 
+    getRoomFromCoord(x, y) {
+        // First divide x and y by tile size to get coords in terms of tiles
+        // Then divide by room size and floor to get coords in terms of rooms
+        x = Math.floor((x / TILE_SIZE) / ROOM_WIDTH);
+        y = Math.floor((y / TILE_SIZE) / ROOM_HEIGHT);
+
+        return this.roomsByCoord[x][y];
+    }
+
     setPlayer(x, y) {
         if (this.player) {
             this.player.setX(x);
@@ -76,6 +98,7 @@ class Game {
 
     // Game logic update
     update(delta) {
+        this.updateDistanceMap();
         for (let index = 0; index < this.gameObjects.length; index++) {
             this.gameObjects[index].update();
         }
@@ -83,10 +106,58 @@ class Game {
         this.resolveCollisions();
     }
 
+    updateDistanceMap() {
+        for (let x = 0; x < this.map.width; x++) {
+            for (let y = 0; y < this.map.height; y++) {
+                this.distanceMap[x][y] = Number.MAX_VALUE;
+            }
+        }
+
+        const playerRoom = this.getRoomFromCoord(this.player.getX(), this.player.getY());
+
+        this.distanceMap[playerRoom.x][playerRoom.y] = 0;
+
+        const openCells = [];
+        openCells.push({
+            x: playerRoom.x,
+            y: playerRoom.y
+        });
+
+        while (openCells.length > 0) {
+            const currentCell = openCells.pop();
+            const currentRoom = this.roomsByCoord[currentCell.x][currentCell.y];
+            const neighbours = currentRoom.getNeighbours();
+
+            for (let index = 0; index < neighbours.length; index++) {
+                const neighbour = neighbours[index];
+                const distance = this.distanceMap[currentRoom.x][currentRoom.y] + 1;
+                if (this.distanceMap[neighbour.x][neighbour.y] > distance) {
+                    this.distanceMap[neighbour.x][neighbour.y] = distance;
+                    openCells.push(neighbour);
+                }
+            }
+        }
+    }
+
     // Main draw function
     draw(context) {        
         for (let gameObjectIndex = 0; gameObjectIndex < this.gameObjects.length; gameObjectIndex++) {
             this.gameObjects[gameObjectIndex].draw(context);
+        }
+
+        // Debug view for visualising distance map
+        for (let x = 0; x < this.map.width; x++) {
+            for (let y = 0; y < this.map.height; y++) {
+                if (this.distanceMap[x][y] === Number.MAX_VALUE) {
+                    continue;
+                }
+
+                context.fillStyle = "rgba(" + (255 - (this.distanceMap[x][y] * 20)) + ", 0, 0, 0.5)";
+                context.fillRect(x * TILE_SIZE * ROOM_WIDTH, 
+                                 y * TILE_SIZE * ROOM_HEIGHT, 
+                                 TILE_SIZE * ROOM_WIDTH, 
+                                 TILE_SIZE * ROOM_HEIGHT);
+            }
         }
     }
 

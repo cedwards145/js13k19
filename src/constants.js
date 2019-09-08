@@ -1,0 +1,5 @@
+const ROOM_HEIGHT = 9;
+const ROOM_WIDTH = 9;
+const TILE_SIZE = 16;
+
+export { ROOM_HEIGHT, ROOM_WIDTH, TILE_SIZE };

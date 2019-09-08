@@ -28,6 +28,8 @@ function loadMap(mapData) {
             const neighbour = map.rooms[getIndex(x + 1, y, mapData.width)];
             
             if (neighbour) {
+                room.addNeighbour(neighbour);
+                
                 // Hard-coded coords needs fixing
                 map.doors.push(new Door(neighbour.left - 4, room.top + 64, 8, 16, false));
             }
@@ -36,6 +38,8 @@ function loadMap(mapData) {
             const neighbour = map.rooms[getIndex(x, y + 1, mapData.width)]
 
             if (neighbour) {
+                room.addNeighbour(neighbour);
+
                 // Hard-coded coords needs fixing
                 map.doors.push(new Door(room.left + 64, neighbour.top - 4, 16, 8, true));
             }

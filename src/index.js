@@ -4,7 +4,6 @@ import { Game } from "./game.js";
 
 const WIDTH = 1280;
 const HEIGHT = 720;
-const TILE_SIZE = 16;
 
 const game = new Game(WIDTH, HEIGHT);
 

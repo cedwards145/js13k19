@@ -1,13 +1,11 @@
 import { Rectangle } from "./rectangle";
 import { GameObject } from "./gameobject";
+import { ROOM_HEIGHT, ROOM_WIDTH, TILE_SIZE } from "./constants";
 
-const ROOM_HEIGHT = 9;
-const ROOM_WIDTH = 9;
 const TOP_WALLS = [0, 3, 4, 5, 7, 10, 11, 13];
 const LEFT_WALLS = [0, 2, 3, 5, 6, 9, 10, 15];
 const BOTTOM_WALLS = [0, 2, 4, 5, 7, 8, 9, 12];
 const RIGHT_WALLS = [0, 2, 3, 4, 6, 8, 11, 14];
-const TILE_SIZE = 16;
 
 class Room extends GameObject {
     constructor(x, y, type) {
@@ -26,6 +24,7 @@ class Room extends GameObject {
         this.hasLeftDoor = !(LEFT_WALLS.includes(type));
         this.hasRightDoor = !(RIGHT_WALLS.includes(type));
         this.colliders = [];
+        this.neighbours = [];
 
         // Special case for type 0, empty tile:
         // Create a single body covering the whole room
@@ -67,6 +66,17 @@ class Room extends GameObject {
             if (!isCenter || !this.hasRightDoor) {
                 this.colliders.push(new Rectangle(this.left + ((ROOM_WIDTH - 1) * TILE_SIZE), this.top + (y * TILE_SIZE), TILE_SIZE, TILE_SIZE));
             }
+        }
+    }
+
+    getNeighbours() {
+        return this.neighbours;
+    }
+
+    addNeighbour(room, reflexive=true) {
+        this.neighbours.push(room);
+        if (reflexive) {
+            room.addNeighbour(this, false);
         }
     }
 
