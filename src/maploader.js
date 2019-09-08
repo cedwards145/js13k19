@@ -29,7 +29,7 @@ function loadMap(mapData) {
             
             if (neighbour) {
                 const door = new Door(neighbour.left - 4, room.top + 64, 8, 16, false);
-                room.addNeighbour(neighbour, door);
+                room.addExit(neighbour, door);
                 
                 // Hard-coded coords needs fixing
                 map.doors.push(door);
@@ -40,7 +40,7 @@ function loadMap(mapData) {
 
             if (neighbour) {
                 const door = new Door(room.left + 64, neighbour.top - 4, 16, 8, true);
-                room.addNeighbour(neighbour, door);
+                room.addExit(neighbour, door);
 
                 // Hard-coded coords needs fixing
                 map.doors.push(door);

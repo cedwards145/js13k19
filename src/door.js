@@ -8,16 +8,22 @@ const CLOSED_STATE = 0;
 const OPENING_STATE = 1;
 const OPEN_STATE = 2;
 const CLOSING_STATE = 3;
+const DESTROYED_TRANSITION_STATE = 4;
+const DESTROYED_STATE = 5;
+const MAX_HEALTH = 100;
 
 class Door extends GameObject {
     constructor(x, y, width, height, isHorizontal) {
         super();
         this.x = x;
         this.y = y;
+        this.width = width;
+        this.height = height;
         this.isHorizontal = isHorizontal
         this.collider = new Rectangle(x, y, width, height);
         this.state = CLOSED_STATE;
         this.locked = false;
+        this.health = MAX_HEALTH;
 
         this.hasBeenTriggered = false;
         this.trigger = new Rectangle(x - 16, y - 16, width + 32, height + 32);
@@ -63,9 +69,14 @@ class Door extends GameObject {
         // If the door is opening or closing, and hasn't finished,
         // set the target to the open or closed position.
         // If it has finished, change state
-        if (this.state === OPENING_STATE) {
+        if (this.state === OPENING_STATE || this.state === DESTROYED_TRANSITION_STATE) {
             if (this.collider.x === this.openX && this.collider.y === this.openY) {
-                this.state = OPEN_STATE;
+                if (this.state === OPENING_STATE) {
+                    this.state = OPEN_STATE;
+                }
+                else if (this.state === DESTROYED_TRANSITION_STATE) {
+                    this.state === DESTROYED_STATE;
+                }
             }
             else {
                 targetX = this.openX;
@@ -98,7 +109,7 @@ class Door extends GameObject {
     }
 
     draw(context) {
-        if (this.locked) {
+        if (this.locked || this.isDestroyed()) {
             context.fillStyle = "red";
         }
         else {
@@ -113,6 +124,25 @@ class Door extends GameObject {
 
     getTriggers() {
         return [this.trigger];
+    }
+
+    getX() {
+        return this.x + this.width / 2;
+    }
+
+    getY() {
+        return this.y + this.height / 2;
+    }
+
+    isDestroyed() {
+        return this.state === DESTROYED_STATE || this.state === DESTROYED_TRANSITION_STATE;
+    }
+
+    damage(amount) {
+        this.health -= amount;
+        if (this.health <= 0) {
+            this.state = DESTROYED_TRANSITION_STATE;
+        }
     }
 }
 

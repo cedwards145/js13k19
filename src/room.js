@@ -24,7 +24,7 @@ class Room extends GameObject {
         this.hasLeftDoor = !(LEFT_WALLS.includes(type));
         this.hasRightDoor = !(RIGHT_WALLS.includes(type));
         this.colliders = [];
-        this.neighbours = [];
+        this.exits = [];
 
         // Special case for type 0, empty tile:
         // Create a single body covering the whole room
@@ -69,18 +69,18 @@ class Room extends GameObject {
         }
     }
 
-    getNeighbours() {
-        return this.neighbours;
+    getExits() {
+        return this.exits;
     }
 
-    addNeighbour(room, door, reflexive=true) {
-        this.neighbours.push({
+    addExit(room, door, reflexive=true) {
+        this.exits.push({
             room: room,
             door: door
         });
-        
+
         if (reflexive) {
-            room.addNeighbour(this, door, false);
+            room.addExit(this, door, false);
         }
     }
 

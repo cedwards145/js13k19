@@ -126,16 +126,17 @@ class Game {
         while (openCells.length > 0) {
             const currentCell = openCells.pop();
             const currentRoom = this.roomsByCoord[currentCell.x][currentCell.y];
-            const neighbours = currentRoom.getNeighbours();
+            const exits = currentRoom.getExits();
 
-            for (let index = 0; index < neighbours.length; index++) {
-                const neighbour = neighbours[index];
-                const neighbourRoom = neighbour.room;
-                const cost = neighbour.door.locked ? 5 : 1;
+            for (let index = 0; index < exits.length; index++) {
+                const exit = exits[index];
+                const neighbour = exit.room;
+                const cost = exit.door.locked ? 5 : 1;
                 const distance = this.distanceMap[currentRoom.x][currentRoom.y] + cost;
-                if (this.distanceMap[neighbourRoom.x][neighbourRoom.y] > distance) {
-                    this.distanceMap[neighbourRoom.x][neighbourRoom.y] = distance;
-                    openCells.push(neighbourRoom);
+
+                if (this.distanceMap[neighbour.x][neighbour.y] > distance) {
+                    this.distanceMap[neighbour.x][neighbour.y] = distance;
+                    openCells.push(neighbour);
                 }
             }
         }
@@ -146,6 +147,8 @@ class Game {
         for (let gameObjectIndex = 0; gameObjectIndex < this.gameObjects.length; gameObjectIndex++) {
             this.gameObjects[gameObjectIndex].draw(context);
         }
+
+        return;
 
         // Debug view for visualising distance map
         for (let x = 0; x < this.map.width; x++) {
