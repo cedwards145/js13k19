@@ -130,10 +130,12 @@ class Game {
 
             for (let index = 0; index < neighbours.length; index++) {
                 const neighbour = neighbours[index];
-                const distance = this.distanceMap[currentRoom.x][currentRoom.y] + 1;
-                if (this.distanceMap[neighbour.x][neighbour.y] > distance) {
-                    this.distanceMap[neighbour.x][neighbour.y] = distance;
-                    openCells.push(neighbour);
+                const neighbourRoom = neighbour.room;
+                const cost = neighbour.door.locked ? 5 : 1;
+                const distance = this.distanceMap[currentRoom.x][currentRoom.y] + cost;
+                if (this.distanceMap[neighbourRoom.x][neighbourRoom.y] > distance) {
+                    this.distanceMap[neighbourRoom.x][neighbourRoom.y] = distance;
+                    openCells.push(neighbourRoom);
                 }
             }
         }

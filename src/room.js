@@ -73,10 +73,14 @@ class Room extends GameObject {
         return this.neighbours;
     }
 
-    addNeighbour(room, reflexive=true) {
-        this.neighbours.push(room);
+    addNeighbour(room, door, reflexive=true) {
+        this.neighbours.push({
+            room: room,
+            door: door
+        });
+        
         if (reflexive) {
-            room.addNeighbour(this, false);
+            room.addNeighbour(this, door, false);
         }
     }
 
