@@ -71,7 +71,6 @@ class Enemy extends Character {
     }
 
     attack(target) {
-        console.log("attack");
         const x = target.getX();
         const y = target.getY();
 

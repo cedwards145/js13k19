@@ -5,13 +5,17 @@ import { Game } from "./game.js";
 const WIDTH = 1280;
 const HEIGHT = 720;
 
-const game = new Game(WIDTH, HEIGHT);
+const tileset = new Image();
 
-const canvas = document.getElementById("game");
-canvas.width = WIDTH;
-canvas.height = HEIGHT;
+const mainCanvas = document.getElementById("game");
+mainCanvas.width = WIDTH;
+mainCanvas.height = HEIGHT;
+const floorCanvas = document.createElement("canvas");
+mainCanvas.parentElement.appendChild(floorCanvas);
 
-const context = canvas.getContext("2d");
+const mainContext = mainCanvas.getContext("2d");
+
+const game = new Game(WIDTH, HEIGHT, tileset, mainCanvas, floorCanvas);
 
 game.loadMap(mapData);
 game.setPlayer(350, 1400);
@@ -37,20 +41,26 @@ function tick(elapsed) {
     game.update(elapsed);
 
     // Clear screen for drawing
-    context.fillStyle = "CornflowerBlue";
-    context.fillRect(0, 0, WIDTH, HEIGHT);
+    mainContext.fillStyle = "CornflowerBlue";
+    mainContext.fillRect(0, 0, WIDTH, HEIGHT);
 
     // Translate canvas co-ords to center the player on screen
     const player = game.getPlayer();
-    context.translate(-1 * (player.getX() - WIDTH / 2), -1 * (player.getY() - HEIGHT / 2));
+    mainContext.translate(-1 * (player.getX() - WIDTH / 2), -1 * (player.getY() - HEIGHT / 2));
     // Draw game
-    game.draw(context);
+    game.draw();
     // Reset context transform to identity matrix
-    context.setTransform(1, 0, 0, 1, 0, 0);
+    mainContext.setTransform(1, 0, 0, 1, 0, 0);
 
     clearPressedKeys();
     window.requestAnimationFrame(tick);
 }
-tick(0);
+
+// Run game start once resources have loaded
+tileset.onload = function() {
+    game.init();
+    tick(0);
+}
+tileset.src = "./tileset.png";
 
 export { getGame };

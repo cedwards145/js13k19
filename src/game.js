@@ -7,9 +7,17 @@ import { Enemy } from "./enemy";
 import { TILE_SIZE, ROOM_HEIGHT, ROOM_WIDTH } from "./constants";
 
 class Game {
-    constructor(width, height) {
+    constructor(width, height, tileset, mainCanvas, floorCanvas) {
         this.width = width;
         this.height = height;
+        
+        // Store main canvas and context along with auxiliary canvases for 
+        // more complex drawing
+        this.tileset = tileset;
+        this.mainCanvas = mainCanvas;
+        this.mainContext = mainCanvas.getContext("2d");
+        this.floorCanvas = floorCanvas;
+        this.floorContext = floorCanvas.getContext("2d");
 
         // Build up lists of colliders for use in physics simulation.
         // Separate out circle colliders which will be dynamic from
@@ -20,6 +28,34 @@ class Game {
         this.staticBodies = [];
         this.triggers = [];
         this.gameObjects = [];
+    }
+
+    // Separate from constructor so that all resources can be loaded before running
+    init() {
+        this.generateFloorPattern();
+    }
+
+    generateFloorPattern() {
+        const tilesAcross = 50;
+        const tilesDown = 50;
+        this.floorCanvas.width = TILE_SIZE * tilesAcross;
+        this.floorCanvas.height = TILE_SIZE * tilesDown;
+
+        for (let x = 0; x < tilesAcross; x++) {
+            for (let y = 0; y < tilesDown; y++) {
+                let xOffset = 0;
+                const value = Math.random() * 100;
+                if (value >= 95) {
+                    xOffset = TILE_SIZE * 1;
+                }
+                else if (value >= 90) {
+                    xOffset = TILE_SIZE * 2;
+                }
+
+                this.floorContext.drawImage(this.tileset, xOffset, 0, TILE_SIZE, TILE_SIZE, x * TILE_SIZE, y * TILE_SIZE, TILE_SIZE, TILE_SIZE);
+            }
+        }
+        this.floorPattern = this.mainContext.createPattern(this.floorCanvas, "repeat");
     }
 
     loadMap(jsonData) {
@@ -143,9 +179,12 @@ class Game {
     }
 
     // Main draw function
-    draw(context) {        
+    draw() {
+        this.mainContext.fillStyle = this.floorPattern;
+        this.mainContext.fillRect(0, 0, this.map.width * TILE_SIZE * ROOM_WIDTH, this.map.height * TILE_SIZE * ROOM_HEIGHT);
+
         for (let gameObjectIndex = 0; gameObjectIndex < this.gameObjects.length; gameObjectIndex++) {
-            this.gameObjects[gameObjectIndex].draw(context);
+            this.gameObjects[gameObjectIndex].draw(this.mainContext);
         }
 
         return;
