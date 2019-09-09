@@ -16,10 +16,13 @@ class Game {
         this.tileset = tileset;
         this.mainCanvas = mainCanvas;
         this.mainContext = mainCanvas.getContext("2d");
+        this.mainContext.imageSmoothingEnabled = false;
         this.floorCanvas = floorCanvas;
         this.floorContext = floorCanvas.getContext("2d");
+        this.floorContext.imageSmoothingEnabled = false;
         this.lightCanvas = lightCanvas;
         this.lightContext = lightCanvas.getContext("2d");
+        this.lightContext.imageSmoothingEnabled = false;
 
         // Build up lists of colliders for use in physics simulation.
         // Separate out circle colliders which will be dynamic from
@@ -87,6 +90,9 @@ class Game {
         }
 
         this.addGameObject(new Enemy(300, 1400));
+
+        this.lightCanvas.width = TILE_SIZE * ROOM_WIDTH * this.map.width;
+        this.lightCanvas.height = TILE_SIZE * ROOM_HEIGHT * this.map.height;
     }
 
     addGameObject(gameObject) {
@@ -182,20 +188,22 @@ class Game {
 
     // Main draw function
     draw() {
+        // Reset any blending operations
+        this.mainContext.globalCompositeOperation = "source-over";
+        this.lightContext.globalAlpha = 1;
+
         // Clear any canvases before canvas transform is applied
         this.lightContext.fillStyle = "black";
-        this.lightContext.fillRect(0, 0, this.width, this.height);
-        this.mainContext.fillStyle = "CornflowerBlue";
+        this.lightContext.fillRect(0, 0, this.lightCanvas.width, this.lightCanvas.height);
+        this.mainContext.fillStyle = "black";
         this.mainContext.fillRect(0, 0, this.width, this.height);
         
-        // Reset any composite operations
-        this.mainContext.globalCompositeOperation = "source-over";
         
         // Translate canvas co-ords to center the player on screen
-        const xOffset = Math.floor(-1 * (this.player.getX() - this.width / 2));
-        const yOffset = Math.floor(-1 * (this.player.getY() - this.height / 2));
-        this.mainContext.translate(xOffset, yOffset);
-        this.lightContext.translate(xOffset, yOffset);
+        const xOffset = Math.floor(this.player.getX() - this.width / 2);
+        const yOffset = Math.floor(this.player.getY() - this.height / 2);
+        this.mainContext.translate(-1 * xOffset, -1 * yOffset);
+        //this.lightContext.translate(xOffset, yOffset);
         
         this.mainContext.fillStyle = this.floorPattern;
         this.mainContext.fillRect(0, 0, this.map.width * TILE_SIZE * ROOM_WIDTH, this.map.height * TILE_SIZE * ROOM_HEIGHT);
@@ -211,7 +219,7 @@ class Game {
 
         // Draw lighting overlay
         this.mainContext.globalCompositeOperation = "multiply";
-        this.mainContext.drawImage(this.lightCanvas, 0, 0);
+        this.mainContext.drawImage(this.lightCanvas, xOffset, yOffset, this.width, this.height, 0, 0, this.width, this.height);
 
         return;
 

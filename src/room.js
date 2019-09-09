@@ -1,6 +1,7 @@
 import { Rectangle } from "./rectangle";
 import { GameObject } from "./gameobject";
 import { ROOM_HEIGHT, ROOM_WIDTH, TILE_SIZE } from "./constants";
+import { Player } from "./player";
 
 const TOP_WALLS = [0, 3, 4, 5, 7, 10, 11, 13];
 const LEFT_WALLS = [0, 2, 3, 5, 6, 9, 10, 15];
@@ -12,9 +13,11 @@ class Room extends GameObject {
         super();
         // Store info read from map data
         this.x = x;
-        this.y = y
-        this.type = type
-        this.lightLevel = Math.random();
+        this.y = y;
+        this.type = type;
+        
+        // Track whether this room has been visited by the player
+        this.visited = false;
 
         // Calculate left and top coords in pixels
         this.left = x * TILE_SIZE * ROOM_WIDTH;
@@ -26,6 +29,8 @@ class Room extends GameObject {
         this.hasRightDoor = !(RIGHT_WALLS.includes(type));
         this.colliders = [];
         this.exits = [];
+
+        this.light = Math.random();
 
         // Special case for type 0, empty tile:
         // Create a single body covering the whole room
@@ -94,13 +99,32 @@ class Room extends GameObject {
     }
 
     drawLight(context) {
-        context.fillStyle = "white";
-        context.globalAlpha = this.lightLevel;
-        context.fillRect(this.top, this.left, ROOM_WIDTH * TILE_SIZE, ROOM_HEIGHT * TILE_SIZE);
+        const containsPlayer = this.containsPlayer();
+        if (this.visited) {
+            if (containsPlayer) {
+                context.globalAlpha = 1;
+            }
+            else {
+                context.globalAlpha = 0.3;
+            }
+            context.fillStyle = "white";
+            context.fillRect(this.left, this.top, TILE_SIZE * ROOM_WIDTH, TILE_SIZE * ROOM_HEIGHT);
+        }
     }
-
+    
     getColliders() {
         return this.colliders;
+    }
+
+    containsPlayer() {
+        const player = this.game.getPlayer();
+        const playersRoom = this.game.getRoomFromCoord(player.getX(), player.getY());
+        if (this == playersRoom) {
+            this.visited = true;
+            return true;
+        }
+
+        return false;
     }
 }
 
