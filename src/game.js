@@ -7,7 +7,7 @@ import { Enemy } from "./enemy";
 import { TILE_SIZE, ROOM_HEIGHT, ROOM_WIDTH } from "./constants";
 
 class Game {
-    constructor(width, height, tileset, mainCanvas, floorCanvas) {
+    constructor(width, height, tileset, mainCanvas, floorCanvas, lightCanvas) {
         this.width = width;
         this.height = height;
         
@@ -18,6 +18,8 @@ class Game {
         this.mainContext = mainCanvas.getContext("2d");
         this.floorCanvas = floorCanvas;
         this.floorContext = floorCanvas.getContext("2d");
+        this.lightCanvas = lightCanvas;
+        this.lightContext = lightCanvas.getContext("2d");
 
         // Build up lists of colliders for use in physics simulation.
         // Separate out circle colliders which will be dynamic from
@@ -180,12 +182,36 @@ class Game {
 
     // Main draw function
     draw() {
+        // Clear any canvases before canvas transform is applied
+        this.lightContext.fillStyle = "black";
+        this.lightContext.fillRect(0, 0, this.width, this.height);
+        this.mainContext.fillStyle = "CornflowerBlue";
+        this.mainContext.fillRect(0, 0, this.width, this.height);
+        
+        // Reset any composite operations
+        this.mainContext.globalCompositeOperation = "source-over";
+        
+        // Translate canvas co-ords to center the player on screen
+        const xOffset = Math.floor(-1 * (this.player.getX() - this.width / 2));
+        const yOffset = Math.floor(-1 * (this.player.getY() - this.height / 2));
+        this.mainContext.translate(xOffset, yOffset);
+        this.lightContext.translate(xOffset, yOffset);
+        
         this.mainContext.fillStyle = this.floorPattern;
         this.mainContext.fillRect(0, 0, this.map.width * TILE_SIZE * ROOM_WIDTH, this.map.height * TILE_SIZE * ROOM_HEIGHT);
 
         for (let gameObjectIndex = 0; gameObjectIndex < this.gameObjects.length; gameObjectIndex++) {
             this.gameObjects[gameObjectIndex].draw(this.mainContext);
+            this.gameObjects[gameObjectIndex].drawLight(this.lightContext);
         }
+        
+        // Reset context transform to identity matrix
+        this.mainContext.setTransform(1, 0, 0, 1, 0, 0);
+        this.lightContext.setTransform(1, 0, 0, 1, 0, 0);
+
+        // Draw lighting overlay
+        this.mainContext.globalCompositeOperation = "multiply";
+        this.mainContext.drawImage(this.lightCanvas, 0, 0);
 
         return;
 

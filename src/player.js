@@ -25,6 +25,8 @@ class Player extends Character {
 
         this.move(x, y);
     }
+
+    damage(amount) {}
 }
 
 export { Player };

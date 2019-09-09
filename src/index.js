@@ -10,12 +10,15 @@ const tileset = new Image();
 const mainCanvas = document.getElementById("game");
 mainCanvas.width = WIDTH;
 mainCanvas.height = HEIGHT;
+const lightCanvas = document.createElement("canvas");
+lightCanvas.width = WIDTH;
+lightCanvas.height = HEIGHT;
+mainCanvas.parentElement.appendChild(lightCanvas);
 const floorCanvas = document.createElement("canvas");
-mainCanvas.parentElement.appendChild(floorCanvas);
 
 const mainContext = mainCanvas.getContext("2d");
 
-const game = new Game(WIDTH, HEIGHT, tileset, mainCanvas, floorCanvas);
+const game = new Game(WIDTH, HEIGHT, tileset, mainCanvas, floorCanvas, lightCanvas);
 
 game.loadMap(mapData);
 game.setPlayer(350, 1400);
@@ -40,17 +43,8 @@ function getGame() {
 function tick(elapsed) {
     game.update(elapsed);
 
-    // Clear screen for drawing
-    mainContext.fillStyle = "CornflowerBlue";
-    mainContext.fillRect(0, 0, WIDTH, HEIGHT);
-
-    // Translate canvas co-ords to center the player on screen
-    const player = game.getPlayer();
-    mainContext.translate(-1 * (player.getX() - WIDTH / 2), -1 * (player.getY() - HEIGHT / 2));
     // Draw game
     game.draw();
-    // Reset context transform to identity matrix
-    mainContext.setTransform(1, 0, 0, 1, 0, 0);
 
     clearPressedKeys();
     window.requestAnimationFrame(tick);

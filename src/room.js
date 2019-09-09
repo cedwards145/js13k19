@@ -14,6 +14,7 @@ class Room extends GameObject {
         this.x = x;
         this.y = y
         this.type = type
+        this.lightLevel = Math.random();
 
         // Calculate left and top coords in pixels
         this.left = x * TILE_SIZE * ROOM_WIDTH;
@@ -90,6 +91,12 @@ class Room extends GameObject {
             const rectangle = this.colliders[bodyIndex];        
             context.fillRect(rectangle.x, rectangle.y, rectangle.width, rectangle.height);
         }
+    }
+
+    drawLight(context) {
+        context.fillStyle = "white";
+        context.globalAlpha = this.lightLevel;
+        context.fillRect(this.top, this.left, ROOM_WIDTH * TILE_SIZE, ROOM_HEIGHT * TILE_SIZE);
     }
 
     getColliders() {
