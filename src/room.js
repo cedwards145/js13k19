@@ -101,13 +101,21 @@ class Room extends GameObject {
     drawLight(context) {
         const containsPlayer = this.containsPlayer();
         if (this.visited) {
+            const centerX = this.left + (TILE_SIZE * ROOM_WIDTH) / 2;
+            const centerY = this.top + (TILE_SIZE * ROOM_HEIGHT) / 2;
+            const gradient = context.createRadialGradient(centerX, centerY, TILE_SIZE, 
+                                                          centerX, centerY, TILE_SIZE * ROOM_WIDTH);
+            
             if (containsPlayer) {
-                context.globalAlpha = 1;
+                gradient.addColorStop(0, 'rgba(255, 255, 255, 1.0)');
             }
             else {
-                context.globalAlpha = 0.3;
+                gradient.addColorStop(0, 'rgba(255, 255, 255, 0.3)');
             }
-            context.fillStyle = "white";
+
+            gradient.addColorStop(1, 'rgba(0, 0, 0, 0)');
+
+            context.fillStyle = gradient;
             context.fillRect(this.left, this.top, TILE_SIZE * ROOM_WIDTH, TILE_SIZE * ROOM_HEIGHT);
         }
     }

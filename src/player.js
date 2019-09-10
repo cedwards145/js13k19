@@ -1,5 +1,6 @@
 import { isKeyDown } from "./input";
 import { Character } from "./character";
+import { TILE_SIZE } from "./constants";
 
 class Player extends Character {
     constructor(x, y) {

@@ -198,7 +198,6 @@ class Game {
         this.mainContext.fillStyle = "black";
         this.mainContext.fillRect(0, 0, this.width, this.height);
         
-        
         // Translate canvas co-ords to center the player on screen
         const xOffset = Math.floor(this.player.getX() - this.width / 2);
         const yOffset = Math.floor(this.player.getY() - this.height / 2);
