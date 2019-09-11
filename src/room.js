@@ -1,6 +1,6 @@
 import { Rectangle } from "./rectangle";
 import { GameObject } from "./gameobject";
-import { ROOM_HEIGHT, ROOM_WIDTH, TILE_SIZE } from "./constants";
+import { ROOM_HEIGHT, ROOM_WIDTH, TILE_SIZE, MAX_LIGHT_DISTANCE } from "./constants";
 import { Player } from "./player";
 
 const TOP_WALLS = [0, 3, 4, 5, 7, 10, 11, 13];
@@ -99,25 +99,29 @@ class Room extends GameObject {
     }
 
     drawLight(context) {
-        const containsPlayer = this.containsPlayer();
-        if (this.visited) {
+        if (Math.random() > 0.999) {
+            return;
+        }
+        
+        if (this.lightLevel > 0) {
             const centerX = this.left + (TILE_SIZE * ROOM_WIDTH) / 2;
             const centerY = this.top + (TILE_SIZE * ROOM_HEIGHT) / 2;
             const gradient = context.createRadialGradient(centerX, centerY, TILE_SIZE, 
-                                                          centerX, centerY, TILE_SIZE * ROOM_WIDTH);
+                                                        centerX, centerY, TILE_SIZE * ROOM_WIDTH);
             
-            if (containsPlayer) {
-                gradient.addColorStop(0, 'rgba(255, 255, 255, 1.0)');
-            }
-            else {
-                gradient.addColorStop(0, 'rgba(255, 255, 255, 0.3)');
-            }
-
+            gradient.addColorStop(0, 'rgba(255, 255, 255, ' + (this.lightLevel / MAX_LIGHT_DISTANCE) + ')');
             gradient.addColorStop(1, 'rgba(0, 0, 0, 0)');
 
             context.fillStyle = gradient;
             context.fillRect(this.left, this.top, TILE_SIZE * ROOM_WIDTH, TILE_SIZE * ROOM_HEIGHT);
         }
+    }
+
+    getEmittedLight() {
+        if (this.containsPlayer()) {
+            return MAX_LIGHT_DISTANCE;
+        }
+        return 0;
     }
     
     getColliders() {
@@ -127,12 +131,7 @@ class Room extends GameObject {
     containsPlayer() {
         const player = this.game.getPlayer();
         const playersRoom = this.game.getRoomFromCoord(player.getX(), player.getY());
-        if (this == playersRoom) {
-            this.visited = true;
-            return true;
-        }
-
-        return false;
+        return this == playersRoom;
     }
 }
 

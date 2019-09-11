@@ -116,9 +116,9 @@ class Door extends GameObject {
     }
 
     drawLight(context) {
-        // Only draw light if one of the rooms it's connected to has been visited
+        // Only draw light if one of the rooms it's connected to has been visited   
         for (let index = 0; index < this.rooms.length; index++) {
-            if (this.rooms[index].visited) {
+            if (this.rooms[index].lightLevel > 0) {
                 const x = this.getX();
                 const y = this.getY();
                 const gradient = context.createRadialGradient(x, y, TILE_SIZE / 2, x, y, TILE_SIZE * 2);
@@ -167,4 +167,4 @@ class Door extends GameObject {
     }
 }
 
-export { Door };
+export { Door, CLOSED_STATE };

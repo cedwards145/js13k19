@@ -5,6 +5,7 @@ import { Rectangle } from "./rectangle";
 import { Room } from "./room";
 import { Enemy } from "./enemy";
 import { TILE_SIZE, ROOM_HEIGHT, ROOM_WIDTH } from "./constants";
+import { CLOSED_STATE } from "./door";
 
 class Game {
     constructor(width, height, tileset, mainCanvas, floorCanvas, lightCanvas) {
@@ -146,8 +147,8 @@ class Game {
         for (let index = 0; index < this.gameObjects.length; index++) {
             this.gameObjects[index].update();
         }
-
         this.resolveCollisions();
+        this.updateLightMap();
     }
 
     updateDistanceMap() {
@@ -182,6 +183,42 @@ class Game {
                     this.distanceMap[neighbour.x][neighbour.y] = distance;
                     openCells.push(neighbour);
                 }
+            }
+        }
+    }
+
+    updateLightMap() {
+        const openCells = [];
+        for (let x = 0; x < this.map.width; x++) {
+            for (let y = 0; y < this.map.height; y++) {
+                const room = this.roomsByCoord[x][y];
+                const lightLevel = room.getEmittedLight();
+                if (lightLevel > 0) {
+                    room.lightLevel = lightLevel;
+                    openCells.push(room);
+                }
+                else {
+                    room.lightLevel = 0;
+                }
+            }
+        }
+
+        while (openCells.length > 0) {
+            const room = openCells.pop();
+            const exits = room.getExits();
+
+            for (let index = 0; index < exits.length; index++) {
+                const exit = exits[index];
+                if (exit.door.state === CLOSED_STATE) {
+                    continue;
+                }
+
+                const neighbour = exit.room;
+                const lightLevel = room.lightLevel - 1;
+                if (lightLevel > 0 && lightLevel > neighbour.lightLevel) {
+                    neighbour.lightLevel = lightLevel;
+                    openCells.push(neighbour);
+                }   
             }
         }
     }
