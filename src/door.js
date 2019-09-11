@@ -2,6 +2,7 @@ import { Rectangle } from "./rectangle";
 import { getPlayer } from "./game";
 import { isKeyPressed } from "./input";
 import { GameObject } from "./gameobject";
+import { TILE_SIZE } from "./constants";
 
 // Door states
 const CLOSED_STATE = 0;
@@ -13,13 +14,14 @@ const DESTROYED_STATE = 5;
 const MAX_HEALTH = 100;
 
 class Door extends GameObject {
-    constructor(x, y, width, height, isHorizontal) {
+    constructor(x, y, width, height, isHorizontal, rooms) {
         super();
         this.x = x;
         this.y = y;
         this.width = width;
         this.height = height;
         this.isHorizontal = isHorizontal
+        this.rooms = rooms;
         this.collider = new Rectangle(x, y, width, height);
         this.state = CLOSED_STATE;
         this.locked = false;
@@ -109,13 +111,32 @@ class Door extends GameObject {
     }
 
     draw(context) {
-        if (this.locked || this.isDestroyed()) {
-            context.fillStyle = "red";
-        }
-        else {
-            context.fillStyle = "green";
-        }
+        context.fillStyle = "black";
         context.fillRect(this.collider.x, this.collider.y, this.collider.width, this.collider.height);
+    }
+
+    drawLight(context) {
+        // Only draw light if one of the rooms it's connected to has been visited
+        for (let index = 0; index < this.rooms.length; index++) {
+            if (this.rooms[index].visited) {
+                const x = this.getX();
+                const y = this.getY();
+                const gradient = context.createRadialGradient(x, y, TILE_SIZE / 2, x, y, TILE_SIZE * 2);
+                
+                if (this.locked || this.isDestroyed()) {
+                    gradient.addColorStop(0, 'rgba(255, 0, 0, 1.0)');
+                }
+                else {
+                    gradient.addColorStop(0, 'rgba(0, 128, 255, 1.0)');
+                }
+                gradient.addColorStop(1, 'rgba(0, 0, 0, 0)');
+                context.fillStyle = gradient;
+                context.fillRect(x - TILE_SIZE * 2, y - TILE_SIZE * 2, TILE_SIZE * 4, TILE_SIZE * 4);
+
+                // Return to ensure light only draws once per door
+                return;
+            }
+        }
     }
 
     getColliders() {

@@ -207,10 +207,12 @@ class Game {
         this.mainContext.fillStyle = this.floorPattern;
         this.mainContext.fillRect(0, 0, this.map.width * TILE_SIZE * ROOM_WIDTH, this.map.height * TILE_SIZE * ROOM_HEIGHT);
 
+        this.lightContext.globalCompositeOperation = "lighten";
         for (let gameObjectIndex = 0; gameObjectIndex < this.gameObjects.length; gameObjectIndex++) {
             this.gameObjects[gameObjectIndex].draw(this.mainContext);
             this.gameObjects[gameObjectIndex].drawLight(this.lightContext);
         }
+        this.lightContext.globalCompositeOperation = "source-over";
         
         // Reset context transform to identity matrix
         this.mainContext.setTransform(1, 0, 0, 1, 0, 0);

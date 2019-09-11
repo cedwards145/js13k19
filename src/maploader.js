@@ -28,7 +28,7 @@ function loadMap(mapData) {
             const neighbour = map.rooms[getIndex(x + 1, y, mapData.width)];
             
             if (neighbour) {
-                const door = new Door(neighbour.left - 4, room.top + 64, 8, 16, false);
+                const door = new Door(neighbour.left - 4, room.top + 64, 8, 16, false, [room, neighbour]);
                 room.addExit(neighbour, door);
                 
                 // Hard-coded coords needs fixing
@@ -39,7 +39,7 @@ function loadMap(mapData) {
             const neighbour = map.rooms[getIndex(x, y + 1, mapData.width)]
 
             if (neighbour) {
-                const door = new Door(room.left + 64, neighbour.top - 4, 16, 8, true);
+                const door = new Door(room.left + 64, neighbour.top - 4, 16, 8, true, [room, neighbour]);
                 room.addExit(neighbour, door);
 
                 // Hard-coded coords needs fixing
