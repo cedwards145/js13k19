@@ -1,4 +1,5 @@
 import { Character } from "./character";
+import { OPEN_STATE } from "./door";
 
 const ATTACK_RANGE = 16;
 
@@ -23,7 +24,7 @@ class Enemy extends Character {
             const bestExit = this.findBestExit(currentRoom);
 
             // If the best exit is unlocked or destroyed, move through it
-            if (!bestExit.door.locked || bestExit.door.isDestroyed()) {
+            if (bestExit.door.state === OPEN_STATE || !bestExit.door.locked || bestExit.door.isDestroyed()) {
                 this.moveTowardsExit(bestExit);
             }
             // Otherwise, attack it

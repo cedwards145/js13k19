@@ -90,7 +90,22 @@ class Game {
             this.addGameObject(this.doors[index]);
         }
 
-        this.addGameObject(new Enemy(300, 1400));
+        
+        // Load player start position from map
+        let playerX = 0;
+        let playerY = 0;
+        
+        for (let index = 0; index < jsonData.properties.length; index++) {
+            const property = jsonData.properties[index];
+            if (property.name === "startX") {
+                playerX = Math.floor((property.value + 0.5) * TILE_SIZE * ROOM_WIDTH);
+            }
+            else if (property.name === "startY") {
+                playerY = Math.floor((property.value + 0.5) * TILE_SIZE * ROOM_HEIGHT);
+            }
+        }
+        this.setPlayer(playerX, playerY);
+        this.addGameObject(new Enemy(playerX, playerY));
 
         this.lightCanvas.width = TILE_SIZE * ROOM_WIDTH * this.map.width;
         this.lightCanvas.height = TILE_SIZE * ROOM_HEIGHT * this.map.height;

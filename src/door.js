@@ -28,9 +28,16 @@ class Door extends GameObject {
         this.health = MAX_HEALTH;
 
         this.hasBeenTriggered = false;
-        this.trigger = new Rectangle(x - 16, y - 16, width + 32, height + 32);
-        this.trigger.onCollision = (other) => {
+        this.openTrigger = new Rectangle(x - 16, y - 16, width + 32, height + 32);
+        this.openTrigger.onCollision = (other) => {
             this.hasBeenTriggered = true;
+        }
+
+        // Add a second, smaller trigger to stop the door closing on objects
+        // half way through
+        this.obstructedTrigger = new Rectangle(x, y, width, height);
+        this.obstructedTrigger.onCollision = (other) => {
+            this.isObstructed = true;
         }
 
         if (this.isHorizontal) {
@@ -55,7 +62,10 @@ class Door extends GameObject {
 
         // If door is closed, unlocked, and the player is in range, open it.
         // Doors should automatically open for the player
-        if (this.state === CLOSED_STATE && !this.locked && this.hasBeenTriggered) {
+        // Also open the door if it's closing, but is obstructed to stop the door 
+        // "crushing" characters caught half way through
+        if ((this.state === CLOSED_STATE && !this.locked && this.hasBeenTriggered) ||
+            (this.state === CLOSING_STATE && this.isObstructed)) {
             this.state = OPENING_STATE;
         }
         // If door is open, it closes if the player is not in range, or the door is
@@ -108,6 +118,7 @@ class Door extends GameObject {
         }
 
         this.hasBeenTriggered = false;
+        this.isObstructed = false;
     }
 
     draw(context) {
@@ -144,7 +155,7 @@ class Door extends GameObject {
     }
 
     getTriggers() {
-        return [this.trigger];
+        return [this.openTrigger, this.obstructedTrigger];
     }
 
     getX() {

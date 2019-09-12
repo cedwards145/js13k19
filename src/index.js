@@ -21,7 +21,6 @@ const mainContext = mainCanvas.getContext("2d");
 const game = new Game(WIDTH, HEIGHT, tileset, mainCanvas, floorCanvas, lightCanvas);
 
 game.loadMap(mapData);
-game.setPlayer(350, 1400);
 
 // Set up input event handlers
 window.onkeydown = keyDown;

@@ -4,9 +4,9 @@ import { ROOM_HEIGHT, ROOM_WIDTH, TILE_SIZE, MAX_LIGHT_DISTANCE } from "./consta
 import { Player } from "./player";
 
 const TOP_WALLS = [0, 3, 4, 5, 7, 10, 11, 13];
-const LEFT_WALLS = [0, 2, 3, 5, 6, 9, 10, 15];
+const LEFT_WALLS = [0, 2, 3, 5, 6, 9, 10, 15, 17];
 const BOTTOM_WALLS = [0, 2, 4, 5, 7, 8, 9, 12];
-const RIGHT_WALLS = [0, 2, 3, 4, 6, 8, 11, 14];
+const RIGHT_WALLS = [0, 2, 3, 4, 6, 8, 11, 14, 17];
 
 class Room extends GameObject {
     constructor(x, y, type) {
@@ -109,7 +109,12 @@ class Room extends GameObject {
             const gradient = context.createRadialGradient(centerX, centerY, TILE_SIZE, 
                                                         centerX, centerY, TILE_SIZE * ROOM_WIDTH);
             
-            gradient.addColorStop(0, 'rgba(255, 255, 255, ' + (this.lightLevel / MAX_LIGHT_DISTANCE) + ')');
+            if (this.type === 17) {
+                gradient.addColorStop(0, 'rgba(0, 200, 255, ' + (this.lightLevel / MAX_LIGHT_DISTANCE) + ')');
+            }
+            else {
+                gradient.addColorStop(0, 'rgba(255, 255, 255, ' + (this.lightLevel / MAX_LIGHT_DISTANCE) + ')');
+            }
             gradient.addColorStop(1, 'rgba(0, 0, 0, 0)');
 
             context.fillStyle = gradient;
