@@ -6,6 +6,19 @@ class Character extends GameObject {
         super();
         this.speed = speed;
         this.collider = new Circle(x + radius, y + radius, radius);
+
+        // Movement direction, will be reset to 0 if stationary
+        this.xDirection = 0;
+        this.yDirection = 0;
+
+        // Facing direction, retains last moved direction, not set to 0 if stationary
+        this.xFacing = 0;
+        this.yFacing = 0;
+    }
+
+    update() {
+        this.xDirection = 0;
+        this.yDirection = 0;
     }
 
     setX(x) {
@@ -33,6 +46,16 @@ class Character extends GameObject {
     }
 
     move(x, y) {
+        this.xDirection = Math.sign(x);
+        this.yDirection = Math.sign(y);
+
+        // Update facing to match direction if at least one axis
+        // of movement was non-zero
+        if (x !== 0 || y !== 0) {
+            this.xFacing = this.xDirection;
+            this.yFacing = this.yDirection;
+        }
+
         this.collider.x += x * this.speed;
         this.collider.y += y * this.speed;
     }

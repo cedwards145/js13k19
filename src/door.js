@@ -178,4 +178,4 @@ class Door extends GameObject {
     }
 }
 
-export { Door, CLOSED_STATE };
+export { Door, CLOSED_STATE, OPEN_STATE };

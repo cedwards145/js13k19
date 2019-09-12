@@ -1,37 +1,78 @@
 import { Character } from "./character";
 import { OPEN_STATE } from "./door";
+import { TILE_SIZE } from "./constants";
 
 const ATTACK_RANGE = 16;
+const ATTACK_EXTEND_FRAMES = 6;
+const ATTACK_RETREAT_FRAMES = 16;
+const ATTACK_COOLDOWN_FRAMES = 8;
 
 class Enemy extends Character {
     constructor(x, y) {
         super(x, y, 7, 1);
+        this.feet = [
+            {x:-6, y:6, direction:1, stride:3},
+            {x:6, y:-6, direction:1, stride:3},
+            {x:-6, y:-6, direction:-1, stride:3},
+            {x:6, y:6, direction:-1, stride:3},
+        ];
+
+        // Sin time for animating legs
+        this.t = 0;
+
+        // Crude animation state for attacking
+        this.attacking = false;
+        this.attackProgress = 0;
+        this.bodyOffset = 0;
     }
 
     update() {
-        const currentRoom = this.game.getRoomFromCoord(this.getX(), this.getY());
-        const player = this.game.getPlayer();
-        const playerRoom = this.game.getRoomFromCoord(player.getX(), player.getY());
-        
-        // If in same room as player, no pathfinding needed
-        // Attack if in range or move towards
-        if (currentRoom === playerRoom) {
-            this.attack(player);
-        }
-        // Otherwise, need to move to the player's room
-        else {
-            // Find the best exit from this room based on distance and locked doors
-            const bestExit = this.findBestExit(currentRoom);
-
-            // If the best exit is unlocked or destroyed, move through it
-            if (bestExit.door.state === OPEN_STATE || !bestExit.door.locked || bestExit.door.isDestroyed()) {
-                this.moveTowardsExit(bestExit);
+        super.update()
+        // Simple attack animation to extend and retreat body as if smashing something
+        if (this.attacking) {
+            this.attackProgress++;
+            if (this.attackProgress <= ATTACK_EXTEND_FRAMES) {
+                // Exponential extend
+                this.bodyOffset = Math.pow(this.attackProgress / 2, 2);
             }
-            // Otherwise, attack it
+            else if (this.attackProgress <= ATTACK_EXTEND_FRAMES + ATTACK_RETREAT_FRAMES) {
+                this.bodyOffset = 16 - (this.attackProgress - ATTACK_EXTEND_FRAMES);
+            }
+            else if (this.attackProgress <= ATTACK_EXTEND_FRAMES + ATTACK_RETREAT_FRAMES + ATTACK_COOLDOWN_FRAMES) {
+                // No action required, force pause before starting next attack
+            }
             else {
-                this.attack(bestExit.door);
-            }            
+                this.attacking = false;
+            }
         }
+        else {
+            const currentRoom = this.game.getRoomFromCoord(this.getX(), this.getY());
+            const player = this.game.getPlayer();
+            const playerRoom = this.game.getRoomFromCoord(player.getX(), player.getY());
+            
+            // If in same room as player, no pathfinding needed
+            // Attack if in range or move towards
+            if (currentRoom === playerRoom) {
+                this.attack(player);
+            }
+            // Otherwise, need to move to the player's room
+            else {
+                // Find the best exit from this room based on distance and locked doors
+                const bestExit = this.findBestExit(currentRoom);
+
+                // If the best exit is unlocked or destroyed, move through it
+                if (bestExit.door.state === OPEN_STATE || !bestExit.door.locked || bestExit.door.isDestroyed()) {
+                    this.moveTowardsExit(bestExit);
+                }
+                // Otherwise, attack it
+                else {
+                    this.attack(bestExit.door);
+                }            
+            }
+        }
+
+        // Increase progress of leg swing
+        this.t += Math.PI / 30;
     }
 
     moveTowardsExit(exit) {
@@ -76,11 +117,33 @@ class Enemy extends Character {
         const y = target.getY();
 
         if (Math.abs(x - this.getX()) < ATTACK_RANGE && Math.abs(y - this.getY()) < ATTACK_RANGE) {
-            target.damage(1);
+            this.attacking = true;
+            this.attackProgress = 0;
+            target.damage(5);
         }
         else {
             this.moveTowards(x, y);
         }
+    }
+
+    draw(context) {
+        context.fillStyle = "black";
+        for (let index = 0; index < this.feet.length; index++) {
+            const foot = this.feet[index];
+            const sinValue = Math.sin(this.t);
+            context.beginPath();
+            context.ellipse(this.getX() + foot.x + (this.xDirection !== 0 ? (sinValue * foot.stride * foot.direction) : 0),
+                            this.getY() + foot.y + (this.yDirection !== 0 ? (sinValue * foot.stride * foot.direction) : 0), 
+                            3, 3, 0, 0, 360);
+            context.closePath();
+            context.fill();
+        }
+
+        const bodyX = this.getX() - TILE_SIZE / 2 + Math.sign(this.xFacing) * this.bodyOffset;
+        const bodyY = this.getY() - TILE_SIZE / 2 + Math.sign(this.yFacing) * this.bodyOffset;
+
+        context.drawImage(this.game.tileset, 0, 16, 16, 16, 
+                          bodyX, bodyY, TILE_SIZE, TILE_SIZE);
     }
 }
 
