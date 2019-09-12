@@ -13,10 +13,7 @@ mainCanvas.height = HEIGHT;
 const lightCanvas = document.createElement("canvas");
 lightCanvas.width = WIDTH;
 lightCanvas.height = HEIGHT;
-mainCanvas.parentElement.appendChild(lightCanvas);
 const floorCanvas = document.createElement("canvas");
-
-const mainContext = mainCanvas.getContext("2d");
 
 const game = new Game(WIDTH, HEIGHT, tileset, mainCanvas, floorCanvas, lightCanvas);
 
@@ -25,14 +22,6 @@ game.loadMap(mapData);
 // Set up input event handlers
 window.onkeydown = keyDown;
 window.onkeyup = keyUp;
-
-function generateLightGradient(context) {
-    var gradient = context.createRadialGradient(player.getX(), player.getY(), TILE_SIZE * 4, player.getX(), player.getY(), TILE_SIZE * 8);
-    gradient.addColorStop(0, 'rgba(0, 0, 0, 0)');
-    gradient.addColorStop(1, 'rgba(0, 0, 0, 1.0)');
-    
-    return gradient;
-}
 
 function getGame() {
     return game;
