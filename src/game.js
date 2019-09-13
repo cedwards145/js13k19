@@ -9,6 +9,7 @@ import { CLOSED_STATE } from "./door";
 import { drawText } from "./graphics";
 import { updateMenu, drawMenu } from "./menu";
 import { drawCutscene, updateCutscene } from "./cutscene";
+import { Scientist } from "./scientist";
 
 class Game {
     constructor(width, height, tileset, mainCanvas, floorCanvas, lightCanvas) {
@@ -72,23 +73,48 @@ class Game {
         this.map = loadMap(jsonData);
         this.rooms = this.map.rooms;
         this.doors = this.map.doors;
+        this.targets = [];
 
-        // Load player start position from map
-        let playerX = 0;
-        let playerY = 0;
+        // Load start position from map
+        let startX = 0;
+        let startY = 0;
         
         for (let index = 0; index < jsonData.properties.length; index++) {
             const property = jsonData.properties[index];
             if (property.name === "startX") {
-                playerX = Math.floor((property.value + 0.5) * TILE_SIZE * ROOM_WIDTH);
+                startX = Math.floor((property.value + 0.5) * TILE_SIZE * ROOM_WIDTH);
             }
             else if (property.name === "startY") {
-                playerY = Math.floor((property.value + 0.5) * TILE_SIZE * ROOM_HEIGHT);
+                startY = Math.floor((property.value + 0.5) * TILE_SIZE * ROOM_HEIGHT);
             }
         }
-        this.setPlayer(playerX, playerY);
-        this.enemy = new Enemy(playerX, playerY + (TILE_SIZE * 2));
+
+        // Position the player in the center of the start room, but close enough to the door
+        // to illuminate the next room.
+        // Needed for intro cutscene
+        this.setPlayer(startX, startY + TILE_SIZE * 3);
+        this.targets.push(this.player);
+
+        // Place the enemy one room below the player
+        this.enemy = new Enemy(startX, startY + (TILE_SIZE  * ROOM_HEIGHT));
         this.addGameObject(this.enemy);
+
+        // Spawn scientists for intro scene near the enemy
+        const scientist1 = new Scientist(this.enemy.getX() - TILE_SIZE * 2, this.enemy.getY() - TILE_SIZE);
+        this.targets.push(scientist1);
+        this.addGameObject(scientist1);
+
+        const scientist2 = new Scientist(this.enemy.getX() + TILE_SIZE * 1, this.enemy.getY() - TILE_SIZE * 2);
+        this.targets.push(scientist2);
+        this.addGameObject(scientist2);
+
+        const scientist3 = new Scientist(this.enemy.getX() + TILE_SIZE * 1.5, this.enemy.getY() + TILE_SIZE * 2);
+        this.targets.push(scientist3);
+        this.addGameObject(scientist3);
+
+        const scientist4 = new Scientist(this.enemy.getX() - TILE_SIZE * 1.5, this.enemy.getY() + TILE_SIZE * 1.5);
+        this.targets.push(scientist4);
+        this.addGameObject(scientist4);
 
         // Build up structures for pathfinding
         // RoomsByCoord maps an x, y pair to a room at that location,
@@ -162,6 +188,10 @@ class Game {
 
     getPlayer() {
         return this.player;
+    }
+
+    getTargets() {
+        return this.targets;
     }
 
     getEnemy() {
@@ -279,6 +309,7 @@ class Game {
             this.gameObjects[gameObjectIndex].draw(this.mainContext);
             this.gameObjects[gameObjectIndex].drawLight(this.lightContext);
         }
+
         this.lightContext.globalCompositeOperation = "source-over";
         
         // Reset context transform to identity matrix
@@ -291,6 +322,14 @@ class Game {
 
         // Draw non-game object systems like menus and cutscenes
         this.mainContext.globalCompositeOperation = "source-over";
+
+        this.mainContext.translate(-1 * xOffset, -1 * yOffset);
+        // Separate loop so that UI draws over everything else
+        for (let gameObjectIndex = 0; gameObjectIndex < this.gameObjects.length; gameObjectIndex++) {
+            this.gameObjects[gameObjectIndex].drawUi(this.mainContext);
+        }
+        this.mainContext.setTransform(1, 0, 0, 1, 0, 0);
+
         drawMenu(this.mainContext, this.tileset);
         drawCutscene(this.mainContext, this.tileset);
 

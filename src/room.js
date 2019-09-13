@@ -85,6 +85,11 @@ class Room extends GameObject {
             door: door
         });
 
+        // Automatically lock all doors from checkpoints
+        if (this.type === 17) {
+            door.locked = true;
+        }
+
         if (reflexive) {
             room.addExit(this, door, false);
         }

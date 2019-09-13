@@ -9,13 +9,15 @@ const ATTACK_COOLDOWN_FRAMES = 8;
 
 class Enemy extends Character {
     constructor(x, y) {
-        super(x, y, 7, 1);
+        super(x, y, 7, 3);
         this.feet = [
             {x:-6, y:6, direction:1, stride:3},
             {x:6, y:-6, direction:1, stride:3},
             {x:-6, y:-6, direction:-1, stride:3},
             {x:6, y:6, direction:-1, stride:3},
         ];
+
+        this.targets = [];
 
         // Sin time for animating legs
         this.t = 0;
@@ -54,14 +56,23 @@ class Enemy extends Character {
             }
         }
         else {
+            // If no target, or target is dead, fetch the next target
+            if (!this.target || !this.target.isAlive) {
+                // No targets left, nothing to do
+                if (this.targets.length == 0) {
+                    return;
+                }
+
+                this.target = this.targets.pop();
+            }
+
             const currentRoom = this.game.getRoomFromCoord(this.getX(), this.getY());
-            const player = this.game.getPlayer();
-            const playerRoom = this.game.getRoomFromCoord(player.getX(), player.getY());
+            const targetRoom = this.game.getRoomFromCoord(this.target.getX(), this.target.getY());
             
             // If in same room as player, no pathfinding needed
             // Attack if in range or move towards
-            if (currentRoom === playerRoom) {
-                this.attack(player);
+            if (currentRoom === targetRoom) {
+                this.attack(this.target);
             }
             // Otherwise, need to move to the player's room
             else {
@@ -89,7 +100,7 @@ class Enemy extends Character {
 
         // Add in minor correction for when enemy is at the door's position,
         // leading to a 0 delta
-        if (Math.abs(x - this.getX()) < 1 && Math.abs(y - this.getY()) < 1) {
+        if (Math.abs(x - this.getX()) < this.speed && Math.abs(y - this.getY()) < this.speed) {
             x = exit.door.isHorizontal ? x : exit.room.left + ROOM_WIDTH / 2;
             y = exit.door.isHorizontal ? exit.room.top + ROOM_HEIGHT / 2 : y;
         }

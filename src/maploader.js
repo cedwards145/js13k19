@@ -58,7 +58,8 @@ function loadMap(mapData) {
 }
 
 function populateRoom(room) {
-    if (SPECIAL_ROOMS.includes(room.type)) {
+    // Hack to stop spawning objects in cutscene room
+    if (SPECIAL_ROOMS.includes(room.type) || (room.x === 1 && room.y === 18)) {
         return [];
     }
 

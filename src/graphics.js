@@ -1,7 +1,13 @@
 const CHARACTER_SIZE = 8;
 const UPPER_A = 65;
 
-function drawText(context, string, tileset, x, y, scale=1) {
+function drawText(context, string, tileset, x, y, scale=1, fillStyle=null) {
+    // Optionally fill a box behind the text before drawing
+    if (fillStyle) {
+        context.fillStyle = fillStyle;
+        context.fillRect(x - 4, y - 4, (string.length * CHARACTER_SIZE) + 8, CHARACTER_SIZE + 8);
+    }
+
     const upperCaseString = string.toUpperCase();
     for (let index = 0; index < upperCaseString.length; index++) {
         let letterIndex = upperCaseString.charCodeAt(index);
@@ -25,6 +31,10 @@ function drawText(context, string, tileset, x, y, scale=1) {
         }
         else if (letterIndex === 41) {
             letterIndex = 29;
+        }
+        // Colon
+        else if (letterIndex === 58) {
+            letterIndex = 30;
         }
         else {
             letterIndex -= UPPER_A;

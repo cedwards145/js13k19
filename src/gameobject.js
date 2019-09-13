@@ -11,6 +11,8 @@ class GameObject {
 
     drawLight(context) {}
 
+    drawUi(context) {}
+    
     getColliders() {
         return [];
     }

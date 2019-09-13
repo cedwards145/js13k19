@@ -3,6 +3,7 @@ import { getPlayer } from "./game";
 import { isKeyPressed } from "./input";
 import { GameObject } from "./gameobject";
 import { TILE_SIZE } from "./constants";
+import { drawText } from "./graphics";
 
 // Door states
 const CLOSED_STATE = 0;
@@ -52,11 +53,10 @@ class Door extends GameObject {
 
     update() {
         const player = this.game.getPlayer();
-        const playerInRange = Math.abs(player.getX() - this.collider.x) < 32 &&
-                              Math.abs(player.getY() - this.collider.y) < 32;
+        const playerInRange = this.isPlayerInRange();
 
         // If player is in range and interact button pressed, toggle door lock
-        if (playerInRange && isKeyPressed(69)) {
+        if (playerInRange && player.canControl && isKeyPressed(69)) {
             this.locked = !this.locked;
         }
 
@@ -121,6 +121,12 @@ class Door extends GameObject {
         this.isObstructed = false;
     }
 
+    isPlayerInRange() {
+        const player = this.game.getPlayer();
+        return Math.abs(player.getX() - this.collider.x) < 32 &&
+               Math.abs(player.getY() - this.collider.y) < 32;
+    }
+
     draw(context) {
         context.fillStyle = "black";
         context.fillRect(this.collider.x, this.collider.y, this.collider.width, this.collider.height);
@@ -147,6 +153,15 @@ class Door extends GameObject {
                 // Return to ensure light only draws once per door
                 return;
             }
+        }
+    }
+
+    drawUi(context) {
+        const player = this.game.getPlayer();
+        if (this.isPlayerInRange() && player.canControl) {
+            const x = this.x + (this.isHorizontal ? this.width + 8 : -24);
+            const y = this.y + (this.isHorizontal ? 0 : -16);
+            drawText(context, "E: Lock", this.game.tileset, x, y, 1, "black")
         }
     }
 

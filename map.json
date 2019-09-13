@@ -25,7 +25,7 @@
         {
          "name":"startY",
          "type":"int",
-         "value":19
+         "value":18
         }],
  "renderorder":"right-down",
  "tiledversion":"1.2.4",
