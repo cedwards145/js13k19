@@ -17,7 +17,13 @@ const ACTIVE = 1;
 const FADE_OUT = 2;
 const INACTIVE = 3;
 const GAME_OVER = 4;
+const GAME_WON = 5;
 let state = FADE_IN;
+
+function win() {
+    opacity = 0;
+    state = GAME_WON;
+}
 
 function updateMenu() {
     if (state === FADE_IN) {
@@ -50,7 +56,7 @@ function updateMenu() {
             startIntro();
         }
     }
-    else if (state === GAME_OVER) {
+    else if (state === GAME_OVER || state === GAME_WON) {
         opacity += 0.01;
     }
 
@@ -83,6 +89,14 @@ function drawMenu(context, tileset) {
         context.globalAlpha = previousOpacity;
         return;
     }
+    else if (state === GAME_WON) {
+        context.fillStyle = "black";
+        context.fillRect(0, 0, getGame().width, getGame().height);
+        drawText(context, "Congratulations!", tileset, 32, 200, 5);
+        drawText(context, "Thanks for playing!", tileset, 32, 350, 3);
+        context.globalAlpha = previousOpacity;
+        return;
+    }
 
     drawText(context, "Fall Back!", tileset, 32, 200, 5);
 
@@ -97,4 +111,4 @@ function drawMenu(context, tileset) {
     context.globalAlpha = previousOpacity;
 }
 
-export { updateMenu, drawMenu };
+export { updateMenu, drawMenu, win };

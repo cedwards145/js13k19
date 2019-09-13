@@ -1,5 +1,6 @@
 import { drawText } from "./graphics";
 import { getGame } from ".";
+import { win } from "./menu";
 
 const INTRO_MESSAGES = [
     "OPERATOR: Starting the experiment.",
@@ -95,6 +96,10 @@ function endScene() {
         enemy.targets = game.getTargets();
         enemy.isActive = true;
         messageQueue = INSTRUCTION_MESSAGES;
+    }
+    else if (messageQueue == CHECKPOINT_THREE_MESSAGES) {
+        messageQueue = null;
+        win();
     }
     else {
         messageQueue = null;

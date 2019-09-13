@@ -38,6 +38,7 @@ class Game {
         this.staticBodies = [];
         this.triggers = [];
         this.gameObjects = [];
+        this.pendingGameObjects = [];
     }
 
     // Separate from constructor so that all resources can be loaded before running
@@ -166,6 +167,11 @@ class Game {
         }
     }
 
+    // Workaround to stop adding to gameobjects array while iterating it
+    addFlare(flare) {
+        this.pendingGameObjects.push(flare);
+    }
+
     getRoomFromCoord(x, y) {
         // First divide x and y by tile size to get coords in terms of tiles
         // Then divide by room size and floor to get coords in terms of rooms
@@ -281,6 +287,12 @@ class Game {
 
         updateMenu();
         updateCutscene();
+
+        // Add any pending game objects to the proper list
+        // now that iteration has finished
+        while (this.pendingGameObjects.length > 0) {
+            this.gameObjects.push(this.pendingGameObjects.pop());
+        }
     }
 
     // Main draw function

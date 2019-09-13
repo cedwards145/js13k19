@@ -1,12 +1,18 @@
-import { isKeyDown } from "./input";
+import { isKeyDown, isKeyPressed } from "./input";
 import { Character } from "./character";
 import { TILE_SIZE } from "./constants";
+import { Flare } from "./flare";
+
+// 10 seconds at 60 FPS
+const MAX_FLARE_TIMER = 10 * 60;
 
 class Player extends Character {
     constructor(x, y) {
         super(x, y, 5, 2);
         this.canControl = false;
         this.isAlive = true;
+
+        this.flareTimer = 0;
     }
 
     update() {
@@ -30,7 +36,18 @@ class Player extends Character {
             y = 1;
         }
 
+        if (isKeyPressed(82) && this.flareTimer >= MAX_FLARE_TIMER) {
+            const flare = new Flare(this.getX(), this.getY());
+            this.game.addFlare(flare);
+            this.flareTimer = 0;
+        }
+
         this.move(x, y);
+
+        this.flareTimer++;
+        if (this.flareTimer > MAX_FLARE_TIMER) {
+            this.flareTimer = MAX_FLARE_TIMER;
+        }
     }
 
     damage(amount) {
@@ -71,6 +88,18 @@ class Player extends Character {
                               TILE_SIZE * 2);
         }
         super.draw(context);
+    }
+
+    drawUi(context) {
+        // Horrible code to draw UI in bottom corner
+        // Should be refactored out into some global UI drawing
+        // function that runs after canvas transform has been popped
+        const x = (this.getX() - (this.game.width / 2)) + 64;
+        const y = (this.getY() + (this.game.height / 2)) - 64;
+        const flarePercentage = this.flareTimer / MAX_FLARE_TIMER;
+
+        context.drawImage(this.game.tileset, 16, 64, TILE_SIZE, TILE_SIZE, x, y, TILE_SIZE * 2, TILE_SIZE * 2);
+        context.drawImage(this.game.tileset, 0, 64, TILE_SIZE * flarePercentage, TILE_SIZE, x, y, TILE_SIZE * flarePercentage * 2, TILE_SIZE * 2);
     }
 }
 

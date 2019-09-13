@@ -9,6 +9,7 @@ class Scientist extends Player {
 
     // Override update method and do nothing to stop input
     update() {}
+    drawUi() {}
 }
 
 export { Scientist };

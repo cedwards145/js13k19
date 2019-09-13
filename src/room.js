@@ -1,6 +1,6 @@
 import { Rectangle } from "./rectangle";
 import { GameObject } from "./gameobject";
-import { ROOM_HEIGHT, ROOM_WIDTH, TILE_SIZE, MAX_LIGHT_DISTANCE } from "./constants";
+import { ROOM_HEIGHT, ROOM_WIDTH, TILE_SIZE, MAX_LIGHT_DISTANCE, MAX_FLARE_DISTANCE } from "./constants";
 import { Player } from "./player";
 import { checkpointOne, checkpointTwo, checkpointThree, checkpointFour } from "./cutscene";
 
@@ -31,7 +31,7 @@ class Room extends GameObject {
         this.colliders = [];
         this.exits = [];
 
-        this.light = Math.random();
+        this.containsFlare = false;
 
         // Special case for type 0, empty tile:
         // Create a single body covering the whole room
@@ -165,6 +165,9 @@ class Room extends GameObject {
     getEmittedLight() {
         if (this.containsPlayer()) {
             return MAX_LIGHT_DISTANCE;
+        }
+        else if (this.containsFlare) {
+            return MAX_FLARE_DISTANCE;
         }
         return 0;
     }
