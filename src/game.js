@@ -1,5 +1,5 @@
 import { Circle } from "./circle";
-import { loadMap } from "./maploader";
+import { loadMap, populateRoom } from "./maploader";
 import { Player } from "./player";
 import { Rectangle } from "./rectangle";
 import { Room } from "./room";
@@ -105,6 +105,11 @@ class Game {
             const room = this.rooms[index];
             this.roomsByCoord[room.x][room.y] = room;
             this.addGameObject(room);
+
+            const obstacles = populateRoom(room);
+            for (let obstacleIndex = 0; obstacleIndex < obstacles.length; obstacleIndex++) {
+                this.addGameObject(obstacles[obstacleIndex]);
+            }
         }
         for (let index = 0; index < this.doors.length; index++) {
             this.addGameObject(this.doors[index]);

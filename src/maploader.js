@@ -1,5 +1,11 @@
 import { Room } from "./room";
 import { Door } from "./door";
+import { Obstacle } from "./obstacle";
+import { TILE_SIZE, ROOM_WIDTH, ROOM_HEIGHT } from "./constants";
+
+// Rooms that should not be populated with objects
+// Contains checkpoint rooms, 4 way intersections and empty rooms
+const SPECIAL_ROOMS = [1, 16, 17];
 
 function loadMap(mapData) {
     const map = {
@@ -51,8 +57,48 @@ function loadMap(mapData) {
     return map;
 }
 
+function populateRoom(room) {
+    if (SPECIAL_ROOMS.includes(room.type)) {
+        return [];
+    }
+
+    const gameObjects = [];
+
+    // Should really have a better way of placing objects, but pathfinding inside a room is stupid.
+    // To avoid things getting stuck, manually place objects around the edges of rooms
+
+    // Storage room top left
+    if (Math.random() <= 0.1) {
+        gameObjects.push(new Obstacle(room.left + TILE_SIZE + Math.random(), room.top + TILE_SIZE + Math.random(), TILE_SIZE, TILE_SIZE, 48, 0));
+        gameObjects.push(new Obstacle(room.left + TILE_SIZE * (2  + Math.random()), room.top + TILE_SIZE + Math.random(), TILE_SIZE, TILE_SIZE, 48, 0));
+        gameObjects.push(new Obstacle(room.left + TILE_SIZE + Math.random(), room.top + TILE_SIZE * 2 + Math.random(), TILE_SIZE, TILE_SIZE, 48, 0));
+    }
+    // Desk top left
+    else if (Math.random() <= 0.2) {
+        gameObjects.push(new Obstacle(room.left + TILE_SIZE, room.top + TILE_SIZE, TILE_SIZE * 2, TILE_SIZE, 64, 0));
+    }
+
+    // Storage bottom right
+    if (Math.random() <= 0.1) {
+        gameObjects.push(new Obstacle(room.left + TILE_SIZE * (ROOM_WIDTH - (2 + Math.random())), room.top + TILE_SIZE * (ROOM_HEIGHT - 2)  + Math.random(), TILE_SIZE, TILE_SIZE, 48, 0));
+        gameObjects.push(new Obstacle(room.left + TILE_SIZE * (ROOM_WIDTH - (2 + Math.random())), room.top + TILE_SIZE * (ROOM_HEIGHT - 3) + Math.random(), TILE_SIZE, TILE_SIZE, 48, 0));
+    }
+
+    // Desk room top right
+    if (Math.random() <= 0.1) {
+        gameObjects.push(new Obstacle(room.left + TILE_SIZE * 6, room.top + TILE_SIZE, TILE_SIZE * 2, TILE_SIZE, 64, 0));
+    }
+    
+    // Break room bottom left
+    if (Math.random() <= 0.1) {
+        gameObjects.push(new Obstacle(room.left + TILE_SIZE, room.top + TILE_SIZE * 6, TILE_SIZE * 2, TILE_SIZE * 2, 96, 0));
+    }
+
+    return gameObjects;
+}
+
 function getIndex(x, y, width) {
     return y * width + x;
 }
 
-export { loadMap };
+export { loadMap, populateRoom };
