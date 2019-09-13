@@ -5,9 +5,14 @@ import { TILE_SIZE } from "./constants";
 class Player extends Character {
     constructor(x, y) {
         super(x, y, 7);
+        this.canControl = false;
     }
 
     update() {
+        if (!this.canControl) {
+            return;
+        }
+
         let x = 0;
         let y = 0;
 

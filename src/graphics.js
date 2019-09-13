@@ -15,6 +15,17 @@ function drawText(context, string, tileset, x, y, scale=1) {
         else if (letterIndex === 46) {
             letterIndex = 26
         }
+        // Re-map exclamation (33) to 27
+        else if (letterIndex === 33) {
+            letterIndex = 27;
+        }
+        // Brackets
+        else if (letterIndex === 40) {
+            letterIndex = 28;
+        }
+        else if (letterIndex === 41) {
+            letterIndex = 29;
+        }
         else {
             letterIndex -= UPPER_A;
         }

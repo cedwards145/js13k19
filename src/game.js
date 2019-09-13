@@ -7,6 +7,7 @@ import { Enemy } from "./enemy";
 import { TILE_SIZE, ROOM_HEIGHT, ROOM_WIDTH } from "./constants";
 import { CLOSED_STATE } from "./door";
 import { drawText } from "./graphics";
+import { updateMenu, drawMenu } from "./menu";
 
 class Game {
     constructor(width, height, tileset, mainCanvas, floorCanvas, lightCanvas) {
@@ -237,6 +238,8 @@ class Game {
                 }   
             }
         }
+
+        updateMenu();
     }
 
     // Main draw function
@@ -276,7 +279,8 @@ class Game {
         this.mainContext.drawImage(this.lightCanvas, xOffset, yOffset, this.width, this.height, 0, 0, this.width, this.height);
 
         this.mainContext.globalCompositeOperation = "source-over";
-        drawText(this.mainContext, "Testing message...", this.tileset, 5, 5, 3);
+        drawMenu(this.mainContext, this.tileset);
+
         return;
 
         // Debug view for visualising distance map
