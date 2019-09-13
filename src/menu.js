@@ -8,8 +8,7 @@ let opacity = 0;
 
 const OPTIONS = [
     "start",
-    "controls",
-    "something else"
+    "controls"
 ];
 
 const FADE_IN = 0;
@@ -18,6 +17,15 @@ const FADE_OUT = 2;
 const INACTIVE = 3;
 const GAME_OVER = 4;
 const GAME_WON = 5;
+
+const INSTRUCTIONS = [
+    "WASD to move",
+    "E to lock and unlock doors", 
+    "R to drop flares",
+    "The icon in the bottom left",
+    "shows the cooldown on flares."
+];
+
 let state = FADE_IN;
 
 function win() {
@@ -103,9 +111,16 @@ function drawMenu(context, tileset) {
     let y = 350;
     for (let index = 0; index < OPTIONS.length; index++) {
         const scale = (index === selectedIndex ? 4 : 2);
-        const text = OPTIONS[index] + (index === selectedIndex ? " (E)" : "");
+        const text = OPTIONS[index] + (index === 0 ? " (E)" : "");
         drawText(context, text, tileset, 32, y, scale);
         y += 16 * scale;
+    }
+
+    // Draw instructions
+    if (selectedIndex === 1) {
+        for (let index = 0; index < INSTRUCTIONS.length; index++) {
+            drawText(context, INSTRUCTIONS[index], tileset, 500, 350 + (32 * index), 2);
+        }
     }
     
     context.globalAlpha = previousOpacity;
