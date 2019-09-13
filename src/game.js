@@ -233,7 +233,7 @@ class Game {
             for (let index = 0; index < exits.length; index++) {
                 const exit = exits[index];
                 const neighbour = exit.room;
-                const cost = exit.door.locked ? 5 : 1;
+                const cost = exit.door.locked ? 3 : 1;
                 const distance = this.distanceMap[currentRoom.x][currentRoom.y] + cost;
 
                 if (this.distanceMap[neighbour.x][neighbour.y] > distance) {
@@ -334,21 +334,6 @@ class Game {
         drawCutscene(this.mainContext, this.tileset);
 
         return;
-
-        // Debug view for visualising distance map
-        for (let x = 0; x < this.map.width; x++) {
-            for (let y = 0; y < this.map.height; y++) {
-                if (this.distanceMap[x][y] === Number.MAX_VALUE) {
-                    continue;
-                }
-
-                context.fillStyle = "rgba(" + (255 - (this.distanceMap[x][y] * 20)) + ", 0, 0, 0.5)";
-                context.fillRect(x * TILE_SIZE * ROOM_WIDTH, 
-                                 y * TILE_SIZE * ROOM_HEIGHT, 
-                                 TILE_SIZE * ROOM_WIDTH, 
-                                 TILE_SIZE * ROOM_HEIGHT);
-            }
-        }
     }
 
     resolveCollisions() {

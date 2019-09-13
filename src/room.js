@@ -2,6 +2,7 @@ import { Rectangle } from "./rectangle";
 import { GameObject } from "./gameobject";
 import { ROOM_HEIGHT, ROOM_WIDTH, TILE_SIZE, MAX_LIGHT_DISTANCE } from "./constants";
 import { Player } from "./player";
+import { checkpointOne, checkpointTwo, checkpointThree, checkpointFour } from "./cutscene";
 
 const TOP_WALLS = [0, 3, 4, 5, 7, 10, 11, 13];
 const LEFT_WALLS = [0, 2, 3, 5, 6, 9, 10, 15, 17];
@@ -40,6 +41,38 @@ class Room extends GameObject {
         else {
             this.generateBodies();
         }
+
+        // Hard-coded triggers to play cutscenes on certain rooms
+        // Checkpoint one
+        if (x === 10 && y === 16) {
+            this.addCutsceneTrigger(() => {
+                checkpointOne();
+            });
+        }
+        // Checkpoint two
+        else if (x === 15 && y === 11) {
+            this.addCutsceneTrigger(() => {
+                checkpointTwo();
+            });
+        }
+        // Checkpoint three
+        else if (x === 11 && y === 9) {
+            this.addCutsceneTrigger(() => {
+                checkpointThree();
+            });
+        }
+    }
+
+    addCutsceneTrigger(cutsceneFunc) {
+        this.cutsceneTriggered = false;
+        this.trigger = new Rectangle(this.left, this.top, ROOM_WIDTH * TILE_SIZE, ROOM_HEIGHT * TILE_SIZE);
+        this.trigger.onCollision = (other) => {
+            if (!this.cutsceneTriggered) {
+                this.cutsceneTriggered = true;
+                cutsceneFunc();
+            }
+        };
+        this.triggers = [this.trigger];
     }
 
     generateBodies() {
@@ -114,8 +147,10 @@ class Room extends GameObject {
             const gradient = context.createRadialGradient(centerX, centerY, TILE_SIZE, 
                                                         centerX, centerY, TILE_SIZE * ROOM_WIDTH);
             
+            // Additional light logic for checkpoint rooms
             if (this.type === 17) {
-                gradient.addColorStop(0, 'rgba(0, 200, 255, ' + (this.lightLevel / MAX_LIGHT_DISTANCE) + ')');
+
+                gradient.addColorStop(0, 'rgba(100, 255, 200, ' + (this.lightLevel / MAX_LIGHT_DISTANCE) + ')');
             }
             else {
                 gradient.addColorStop(0, 'rgba(255, 255, 255, ' + (this.lightLevel / MAX_LIGHT_DISTANCE) + ')');
@@ -136,6 +171,13 @@ class Room extends GameObject {
     
     getColliders() {
         return this.colliders;
+    }
+
+    getTriggers() {
+        if (this.triggers) {
+            return this.triggers;
+        }
+        return super.getTriggers();
     }
 
     containsPlayer() {

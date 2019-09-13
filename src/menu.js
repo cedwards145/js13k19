@@ -16,6 +16,7 @@ const FADE_IN = 0;
 const ACTIVE = 1;
 const FADE_OUT = 2;
 const INACTIVE = 3;
+const GAME_OVER = 4;
 let state = FADE_IN;
 
 function updateMenu() {
@@ -49,6 +50,14 @@ function updateMenu() {
             startIntro();
         }
     }
+    else if (state === GAME_OVER) {
+        opacity += 0.01;
+    }
+
+    if (!getGame().getPlayer().isAlive && state !== GAME_OVER) {
+        opacity = 0;
+        state = GAME_OVER;
+    }
 }
     
 function click() {
@@ -65,6 +74,16 @@ function drawMenu(context, tileset) {
     
     const previousOpacity = context.globalAlpha;
     context.globalAlpha = opacity;
+
+    if (state === GAME_OVER) {
+        context.fillStyle = "black";
+        context.fillRect(0, 0, getGame().width, getGame().height);
+        drawText(context, "Game Over!", tileset, 32, 200, 5);
+        drawText(context, "Refresh the page to play again.", tileset, 32, 350, 3);
+        context.globalAlpha = previousOpacity;
+        return;
+    }
+
     drawText(context, "Fall Back!", tileset, 32, 200, 5);
 
     let y = 350;

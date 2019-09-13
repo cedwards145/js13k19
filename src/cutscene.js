@@ -14,6 +14,21 @@ const INSTRUCTION_MESSAGES = [
     "SECURITY: ...to stop the advance of the drone."
 ];
 
+const CHECKPOINT_ONE_MESSAGES = [
+    "SECURITY: Checkpoint A reached, drone in hot pursuit.",
+    "SECURITY: Proceed to the next checkpoint ASAP."
+];
+
+const CHECKPOINT_TWO_MESSAGES = [
+    "SECURITY: The drone is proving more resillient than expected.",
+    "SECURITY: You are advised to exit the laboratory through the...",
+    "SECURITY: ...remaining last security checkpoint."
+];
+
+const CHECKPOINT_THREE_MESSAGES = [
+    "SECURITY: Nicely done, head on upstairs. We can take it from here."
+];
+
 let messageQueue = null;
 let messageIndex = 0;
 let messageProgress = 0;
@@ -21,7 +36,26 @@ let pauseTimer = 0;
 const PAUSE_BETWEEN_MESSAGES = 200;
 
 function startIntro() {
-    messageQueue = INTRO_MESSAGES; 
+    playMessages(INTRO_MESSAGES);
+}
+
+function checkpointOne() {
+    playMessages(CHECKPOINT_ONE_MESSAGES);
+}
+
+function checkpointTwo() {
+    playMessages(CHECKPOINT_TWO_MESSAGES);
+}
+
+function checkpointThree() {
+    playMessages(CHECKPOINT_THREE_MESSAGES);
+}
+
+function playMessages(queue) {
+    messageQueue = queue;
+    messageProgress = 0;
+    messageIndex = 0;
+    pauseTimer = 0;
 }
 
 function updateCutscene() {
@@ -77,4 +111,4 @@ function drawCutscene(context, tileset) {
     }
 }
 
-export { startIntro, updateCutscene, drawCutscene };
+export { startIntro, checkpointOne, checkpointTwo, checkpointThree, updateCutscene, drawCutscene };

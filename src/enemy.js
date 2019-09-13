@@ -138,7 +138,7 @@ class Enemy extends Character {
         if (Math.abs(x - this.getX()) < ATTACK_RANGE && Math.abs(y - this.getY()) < ATTACK_RANGE) {
             this.attacking = true;
             this.attackProgress = 0;
-            target.damage(10);
+            target.damage(15);
         }
         else {
             this.moveTowards(x, y);
