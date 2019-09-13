@@ -1,6 +1,7 @@
 import { drawText } from "./graphics";
 import { isKeyPressed } from "./input";
 import { getGame } from ".";
+import { startIntro } from "./cutscene";
 
 let selectedIndex = 0;
 let opacity = 0;
@@ -19,7 +20,7 @@ let state = FADE_IN;
 
 function updateMenu() {
     if (state === FADE_IN) {
-        opacity += 0.01;
+        opacity += 0.05;
         if (opacity >= 1) {
             state = ACTIVE;
         }
@@ -42,10 +43,10 @@ function updateMenu() {
         selectedIndex = selectedIndex % OPTIONS.length;
     }
     else if (state === FADE_OUT) {
-        opacity -= 0.01;
+        opacity -= 0.05;
         if (opacity <= 0) {
             state = INACTIVE;
-            getGame().getPlayer().canControl = true;
+            startIntro();
         }
     }
 }

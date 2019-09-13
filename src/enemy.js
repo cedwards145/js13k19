@@ -1,6 +1,6 @@
 import { Character } from "./character";
 import { OPEN_STATE } from "./door";
-import { TILE_SIZE } from "./constants";
+import { TILE_SIZE, ROOM_WIDTH, ROOM_HEIGHT } from "./constants";
 
 const ATTACK_RANGE = 16;
 const ATTACK_EXTEND_FRAMES = 6;
@@ -24,10 +24,18 @@ class Enemy extends Character {
         this.attacking = false;
         this.attackProgress = 0;
         this.bodyOffset = 0;
+        
+        this.isActive = false;
     }
 
     update() {
         super.update()
+
+        // Allows enemy to be disabled during cutscenes
+        if (!this.isActive) {
+            return;
+        }
+
         // Simple attack animation to extend and retreat body as if smashing something
         if (this.attacking) {
             this.attackProgress++;
@@ -82,8 +90,8 @@ class Enemy extends Character {
         // Add in minor correction for when enemy is at the door's position,
         // leading to a 0 delta
         if (Math.abs(x - this.getX()) < 1 && Math.abs(y - this.getY()) < 1) {
-            x = exit.room.left;
-            y = exit.room.top;
+            x = exit.door.isHorizontal ? x : exit.room.left + ROOM_WIDTH / 2;
+            y = exit.door.isHorizontal ? exit.room.top + ROOM_HEIGHT / 2 : y;
         }
         this.moveTowards(x, y);
     }
@@ -119,7 +127,7 @@ class Enemy extends Character {
         if (Math.abs(x - this.getX()) < ATTACK_RANGE && Math.abs(y - this.getY()) < ATTACK_RANGE) {
             this.attacking = true;
             this.attackProgress = 0;
-            target.damage(5);
+            target.damage(10);
         }
         else {
             this.moveTowards(x, y);

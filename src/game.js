@@ -8,6 +8,7 @@ import { TILE_SIZE, ROOM_HEIGHT, ROOM_WIDTH } from "./constants";
 import { CLOSED_STATE } from "./door";
 import { drawText } from "./graphics";
 import { updateMenu, drawMenu } from "./menu";
+import { drawCutscene, updateCutscene } from "./cutscene";
 
 class Game {
     constructor(width, height, tileset, mainCanvas, floorCanvas, lightCanvas) {
@@ -72,6 +73,23 @@ class Game {
         this.rooms = this.map.rooms;
         this.doors = this.map.doors;
 
+        // Load player start position from map
+        let playerX = 0;
+        let playerY = 0;
+        
+        for (let index = 0; index < jsonData.properties.length; index++) {
+            const property = jsonData.properties[index];
+            if (property.name === "startX") {
+                playerX = Math.floor((property.value + 0.5) * TILE_SIZE * ROOM_WIDTH);
+            }
+            else if (property.name === "startY") {
+                playerY = Math.floor((property.value + 0.5) * TILE_SIZE * ROOM_HEIGHT);
+            }
+        }
+        this.setPlayer(playerX, playerY);
+        this.enemy = new Enemy(playerX, playerY + (TILE_SIZE * 2));
+        this.addGameObject(this.enemy);
+
         // Build up structures for pathfinding
         // RoomsByCoord maps an x, y pair to a room at that location,
         // DistanceMap maps an x, y pair to the distance that room is from the player
@@ -91,23 +109,6 @@ class Game {
         for (let index = 0; index < this.doors.length; index++) {
             this.addGameObject(this.doors[index]);
         }
-
-        
-        // Load player start position from map
-        let playerX = 0;
-        let playerY = 0;
-        
-        for (let index = 0; index < jsonData.properties.length; index++) {
-            const property = jsonData.properties[index];
-            if (property.name === "startX") {
-                playerX = Math.floor((property.value + 0.5) * TILE_SIZE * ROOM_WIDTH);
-            }
-            else if (property.name === "startY") {
-                playerY = Math.floor((property.value + 0.5) * TILE_SIZE * ROOM_HEIGHT);
-            }
-        }
-        this.setPlayer(playerX, playerY);
-        this.addGameObject(new Enemy(playerX, playerY));
 
         this.lightCanvas.width = TILE_SIZE * ROOM_WIDTH * this.map.width;
         this.lightCanvas.height = TILE_SIZE * ROOM_HEIGHT * this.map.height;
@@ -156,6 +157,10 @@ class Game {
 
     getPlayer() {
         return this.player;
+    }
+
+    getEnemy() {
+        return this.enemy;
     }
 
     // Game logic update
@@ -240,6 +245,7 @@ class Game {
         }
 
         updateMenu();
+        updateCutscene();
     }
 
     // Main draw function
@@ -278,8 +284,10 @@ class Game {
         this.mainContext.globalCompositeOperation = "multiply";
         this.mainContext.drawImage(this.lightCanvas, xOffset, yOffset, this.width, this.height, 0, 0, this.width, this.height);
 
+        // Draw non-game object systems like menus and cutscenes
         this.mainContext.globalCompositeOperation = "source-over";
         drawMenu(this.mainContext, this.tileset);
+        drawCutscene(this.mainContext, this.tileset);
 
         return;
 
